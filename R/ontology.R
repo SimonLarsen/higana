@@ -17,10 +17,9 @@ read_obo <- function(path, relationships) {
 #' @param path Path to GAF file.
 #' @param aspects Character vector of aspects to include. Leave blank to include all aspects.
 #' @param exclude_evidence Character vector of evidence types to exclude.
-#' @importFrom readr read_delim
 #' @export
 read_gaf <- function(path, aspects, exclude_evidence) {
-  anno <- suppressMessages(read_delim(path, comment="!", quote="", delim="\t", col_names=FALSE))
+  anno <- read.table(path, header=FALSE, comment.char="!", stringsAsFactors=FALSE, sep="\t", quote="")
   if(!missing(aspects)) {
     anno <- anno[anno[[9]] %in% aspects,]
   }
@@ -173,26 +172,4 @@ collapse_redundant_terms.ontology <- function(o) {
 
   # Remove collapsed terms from ontology
   filter(o, o$id[!redundant])
-}
-
-#' @importFrom datastructures stack
-#' @importFrom datastructures insert
-#' @importFrom datastructures pop
-#' @export
-topological_order <- function(o, root) UseMethod("topological_order")
-
-#' @export
-topological_order.ontology <- function(o, root) {
-  s <- stack()
-  order <- stack()
-  insert(s, root)
-  visited <- setNames(rep(FALSE, length(o$id)), o$id)
-  while(length(s) > 0) {
-    v <- pop(s)
-    if(!visited[[v]]) {
-      visited[[v]] <- TRUE
-      insert(order, v)
-      insert(s, o$children[[v]])
-    }
-  }
 }
