@@ -40,7 +40,7 @@ go <- readRDS("ontology.rds")
 
 snps <- read.plink("geno.bed", "geno.bim", "geno.fam")
 
-genemap <- make_genemap(geno$map, "hg19", maxgap=10e3)
+genemap <- make_genemap(snps$map, "hg19", maxgap=10e3)
 
 pc <- compute_term_pcs(go, snps$genotypes, genemap, npcs=4, num_threads=8)
 
