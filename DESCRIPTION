@@ -1,0 +1,16 @@
+Package: ontogwas
+Type: Package
+Title: Ontology-based analysis of genomic variants.
+Version: 0.1.0
+Authors@R: person("Simon Jonas", "Larsen", email="simonhffh@gmail.com", role=c("aut","cre"))
+Maintainer: Simon J. Larsen <simonhffh@gmail.com>
+Description: Add a description here.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1
+Imports:
+    readr,
+    ontologyIndex,
+    fastmatch,
+    GenomicRanges
