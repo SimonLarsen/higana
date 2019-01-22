@@ -24,7 +24,7 @@ go <- go %>%
   filter_obsolete() %>%
   unite_roots(c("GO:0008150","GO:0003674","GO:0005575")) %>%
   annotate(anno) %>%
-  propagate_annotations() %>% # this step is unoptimized and will take a while
+  propagate_annotations() %>%
   collapse_redundant_terms()
 
 saveRDS(go, "ontology.rds")

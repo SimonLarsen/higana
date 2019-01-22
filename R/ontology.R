@@ -126,16 +126,26 @@ annotate.ontology <- function(o, annotations) {
 #' @param o An \code{ontology} object.
 #' @return A propagated \code{ontology} object.
 #' @importFrom ontologyIndex get_descendants
+#' @importFrom igraph graph_from_data_frame
+#' @importFrom igraph topo_sort
+#' @importFrom igraph as_ids
 #' @export
 propagate_annotations <- function(o) UseMethod("propagate_annotations")
 
 #' @export
 propagate_annotations.ontology <- function(o) {
   if(class(o) != "ontology") stop("o is not an ontology object.")
-  for(term in o$id) {
-    desc <- get_descendants(o, term, exclude_roots=TRUE)
-    st <- unique(unlist(o$genes[desc]))
-    o$genes[[term]] <- union(o$genes[[term]], st)
+
+  edges <- data.frame(from=rep(o$id, lengths(o$children)), to=unlist(o$children), stringsAsFactors=FALSE)
+  g <- graph_from_data_frame(edges, directed=TRUE)
+  term_order <- as_ids(topo_sort(g, "out"))
+
+  for(term in rev(term_order)) {
+    ch <- o$children[[term]]
+    if(length(ch) > 0) {
+      st <- Reduce(union, o$genes[ch])
+      o$genes[[term]] <- union(o$genes[[term]], st)
+    }
   }
   return(o)
 }

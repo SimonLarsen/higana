@@ -13,4 +13,6 @@ Imports:
     ontologyIndex,
     fastmatch,
     GenomicRanges,
-    flashpcaR
+    flashpcaR,
+    igraph,
+    pbapply
