@@ -21,15 +21,16 @@ compute_term_pcs <- function(o, geno, genemap, npcs=4, max_term_size=Inf) {
   }
 
   terms <- o$id[lengths(o$genes) <= max_term_size]
+  message("Extracting gene SNPs.")
+  term_snps <- pblapply(setNames(terms, terms), function(term) {
+    as.character(unique(genemap[genemap$gene %fin% o$genes[[term]], "snp"]))
+  })
+  term_snps <- term_snps[lengths(term_snps) > 0]
 
-  pcs <- pblapply(head(setNames(terms, terms), 2000), function(term) tryCatch({
-    snps <- as.character(unique(genemap[genemap$gene %fin% o$genes[[term]], "snp"]))
-    if(length(snps) == 0) return(NULL)
-
+  message("Computing PCs.")
+  pblapply(term_snps, function(snps) tryCatch({
     x <- as(geno[,snps], "numeric")
-
     pc <- flashpca(x, npcs, "binom2")
     return(pc$vectors)
   }, error=function(e) return(NULL)))
-  pcs
 }
