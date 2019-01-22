@@ -13,4 +13,5 @@ Imports:
     readr,
     ontologyIndex,
     fastmatch,
-    GenomicRanges
+    GenomicRanges,
+    flashpcaR

@@ -7,7 +7,7 @@ files <- c(
 )
 
 genes <- lapply(files, function(file) {
-  read.table(file, header=FALSE, col.names=c("chr","start","end","name"))
+  read.table(file, header=FALSE, col.names=c("chr","start","end","name"), stringsAsFactors=FALSE)
 })
 
 usethis::use_data(genes, overwrite=TRUE)
