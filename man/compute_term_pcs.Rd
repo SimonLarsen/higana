@@ -13,6 +13,8 @@ compute_term_pcs(o, geno, genemap, npcs = 4, max_term_size = Inf)
 
 \item{genemap}{A data frame mapping genes to SNP rs numbers.}
 
+\item{npcs}{Number of principal components to compute per term.}
+
 \item{max_term_size}{Skip terms annotated with more than this number of genes.}
 }
 \description{

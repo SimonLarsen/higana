@@ -24,7 +24,7 @@ go <- go %>%
   filter_obsolete() %>%
   unite_roots(c("GO:0008150","GO:0003674","GO:0005575")) %>%
   annotate(anno) %>%
-  propagate_annotations() %>%
+  propagate_annotations() %>% # this step is unoptimized and will take a while
   collapse_redundant_terms()
 
 saveRDS(go, "ontology.rds")
@@ -42,7 +42,17 @@ snps <- read.plink("geno.bed", "geno.bim", "geno.fam")
 
 genemap <- make_genemap(geno$map, "hg19", maxgap=10e3)
 
-pc <- compute_term_pcs(go, snps$genotypes, genemap, npcs=4)
+pc <- compute_term_pcs(go, snps$genotypes, genemap, npcs=4, num_threads=8)
+
+saveRDS(pc, "term_pcs.rds") # warning: large file
 ```
 
 ### Performing association tests
+
+```r
+library(ontogwas)
+
+go <- readRDS("ontology.rds")
+pc <- readRDS("term_pcs.rds")
+
+```

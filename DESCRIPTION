@@ -13,5 +13,4 @@ Imports:
     ontologyIndex,
     fastmatch,
     GenomicRanges,
-    flashpcaR,
-    datastructures
+    flashpcaR

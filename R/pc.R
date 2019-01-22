@@ -3,9 +3,11 @@
 #' @param o An annotated \code{ontology} object.
 #' @param geno A \code{SnpMatrix} genotype matrix.
 #' @param genemap A data frame mapping genes to SNP rs numbers.
+#' @param npcs Number of principal components to compute per term.
 #' @param max_term_size Skip terms annotated with more than this number of genes.
 #' @importFrom fastmatch "%fin%"
 #' @importFrom flashpcaR flashpca
+#' @importFrom pbapply pblapply
 #' @export
 compute_term_pcs <- function(o, geno, genemap, npcs=4, max_term_size=Inf) {
   if(class(o) != "ontology") {
@@ -18,12 +20,16 @@ compute_term_pcs <- function(o, geno, genemap, npcs=4, max_term_size=Inf) {
     stop("geno is not a SnpMatrix object.")
   }
 
-  lapply(setNames(o$id, o$id), function(term) tryCatch({
-    if(length(o$genes[[term]]) > max_term_size) return(NULL)
+  terms <- o$id[lengths(o$genes) <= max_term_size]
 
-    snps <- unique(genemap[genemap$gene %fin% o$genes[[term]], "snp"])
-    x <- geno[,snps]
+  pcs <- pblapply(head(setNames(terms, terms), 2000), function(term) tryCatch({
+    snps <- as.character(unique(genemap[genemap$gene %fin% o$genes[[term]], "snp"]))
+    if(length(snps) == 0) return(NULL)
+
+    x <- as(geno[,snps], "numeric")
+
     pc <- flashpca(x, npcs, "binom2")
-    pc$vectors
-  }, error=function(e) NULL))
+    return(pc$vectors)
+  }, error=function(e) return(NULL)))
+  pcs
 }

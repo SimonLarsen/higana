@@ -22,6 +22,6 @@ make_genemap <- function(snps, ref="hg19", maxgap=10e3) {
 
   hits <- findOverlaps(gene_ranges, snp_ranges, maxgap=maxgap, select="all")
 
-  out <- data.frame(gene=gene_ranges$name[hits@from], snp=snp_ranges$snp.name[hits@to])
+  out <- data.frame(gene=gene_ranges$name[hits@from], snp=snp_ranges$snp.name[hits@to], stringsAsFactors=FALSE)
   unique(out)
 }
