@@ -4,16 +4,21 @@
 \alias{test_terms}
 \title{Perform association test for all terms}
 \usage{
-test_terms(formula, covars, pc, npcs)
+test_terms(formula, covars, o, pc, npcs = Inf,
+  against = "whole.genome")
 }
 \arguments{
 \item{formula}{An object of class \code{formula}.}
 
 \item{covars}{A data frame containing covariates.}
 
+\item{o}{An \code{ontology} object.}
+
 \item{pc}{Named list of PCs from terms. Computed with \code{\link{compute_term_pcs}}.}
 
-\item{npcs}{Number of PCs to use.}
+\item{npcs}{Number of PCs to use. Set of \code{Inf} to use all available.}
+
+\item{against}{Model to test against for significance. One of "whole.genome", "parent".}
 }
 \description{
 Perform association test for all terms
