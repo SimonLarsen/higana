@@ -54,5 +54,7 @@ library(ontogwas)
 
 go <- readRDS("ontology.rds")
 pc <- readRDS("term_pcs.rds")
+covars <- read.table("covars.tsv")
 
+results <- test_terms(class ~ sex + age, covars, pc, npcs=4)
 ```
