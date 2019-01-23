@@ -6,6 +6,9 @@
 #' @param pc Named list of PCs from terms. Computed with \code{\link{compute_term_pcs}}.
 #' @param npcs Number of PCs to use. Set of \code{Inf} to use all available.
 #' @param against Model to test against for significance. One of "whole.genome", "parent".
+#' @return A list with elements:
+#'   \item{\code{test}}{Test objects for each term.}
+#'   \item{\code{pvalue}}{p-values for each term.}
 #' @importFrom pbapply pblapply
 #' @importFrom fastmatch "%fin%"
 #' @export

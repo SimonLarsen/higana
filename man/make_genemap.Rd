@@ -7,7 +7,7 @@
 make_genemap(snps, ref = "hg19", maxgap = 10000)
 }
 \arguments{
-\item{snps}{A}
+\item{snps}{A data frame mapping SNPs to genomic positions. Must have the columns "chromosome", "snp.name" and "position".}
 
 \item{ref}{Reference genome. One of "hg18", "hg19", "hg38".}
 

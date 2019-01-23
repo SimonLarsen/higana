@@ -8,6 +8,7 @@
 #' @importFrom fastmatch "%fin%"
 #' @importFrom flashpcaR flashpca
 #' @importFrom pbapply pblapply
+#' @return A list of matrices where each column corresponds to a PC.
 #' @export
 compute_term_pcs <- function(o, geno, genemap, npcs=4, max_term_size=Inf) {
   if(class(o) != "ontology") {

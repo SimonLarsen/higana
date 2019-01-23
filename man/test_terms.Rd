@@ -20,6 +20,11 @@ test_terms(formula, covars, o, pc, npcs = Inf,
 
 \item{against}{Model to test against for significance. One of "whole.genome", "parent".}
 }
+\value{
+A list with elements:
+  \item{\code{test}}{Test objects for each term.}
+  \item{\code{pvalue}}{p-values for each term.}
+}
 \description{
 Perform association test for all terms
 }

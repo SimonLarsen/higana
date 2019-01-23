@@ -1,6 +1,6 @@
 #' Create mapping from genes to SNPs.
 #'
-#' @param snps A
+#' @param snps A data frame mapping SNPs to genomic positions. Must have the columns "chromosome", "snp.name" and "position".
 #' @param ref Reference genome. One of "hg18", "hg19", "hg38".
 #' @param maxgap Maximum allowed distance between SNP and gene.
 #' @return A data frame mapping genes to SNPs.

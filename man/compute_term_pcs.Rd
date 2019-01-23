@@ -17,6 +17,9 @@ compute_term_pcs(o, geno, genemap, npcs = 4, max_term_size = Inf)
 
 \item{max_term_size}{Skip terms annotated with more than this number of genes.}
 }
+\value{
+A list of matrices where each column corresponds to a PC.
+}
 \description{
 Compute principal components of SNPs annotated to ontology terms.
 }
