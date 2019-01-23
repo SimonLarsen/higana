@@ -30,7 +30,7 @@ compute_term_pcs <- function(o, geno, genemap, npcs=4, max_term_size=Inf) {
   message("Computing PCs.")
   pblapply(term_snps, function(snps) tryCatch({
     x <- as(geno[,snps], "numeric")
-    pc <- flashpca(x, npcs, "binom2")
+    pc <- flashpca(x, npcs, "binom2", check_geno=FALSE, return_scale=FALSE, do_loadings=FALSE)
     return(pc$vectors)
   }, error=function(e) return(NULL)))
 }
