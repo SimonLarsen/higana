@@ -19,9 +19,6 @@ compute_term_pcs <- function(o, geno, genemap, npcs=4, max_term_size=Inf) {
   if(!("SnpMatrix" %in% class(geno))) {
     stop("geno is not a SnpMatrix object.")
   }
-  if("__POPULATION__" %in% o$id)  {
-    stop("Term name \"__POPULATION__\" is reserved.")
-  }
 
   terms <- o$id[lengths(o$genes) <= max_term_size]
   message("Extracting gene SNPs.")
@@ -30,12 +27,12 @@ compute_term_pcs <- function(o, geno, genemap, npcs=4, max_term_size=Inf) {
   })
   term_snps <- term_snps[lengths(term_snps) > 0]
 
-  term_snps[["__POPULATION__"]] <- unique(genemap$snp)
-
   message("Computing PCs.")
-  pblapply(term_snps, function(snps) tryCatch({
+  pc <- pblapply(term_snps, function(snps) tryCatch({
     x <- as(geno[,snps], "numeric")
     pc <- flashpca(x, npcs, "binom2", check_geno=FALSE, return_scale=FALSE, do_loadings=FALSE)
     return(pc$vectors)
   }, error=function(e) return(NULL)))
+
+  pc[!sapply(pc, is.null)]
 }
