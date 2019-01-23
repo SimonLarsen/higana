@@ -17,7 +17,7 @@ devtools::install_github("SimonLarsen/ontogwas")
 library(magrittr)
 library(ontogwas)
 
-go <- read_obo("go.obo") # http://geneontology.org/page/download-ontology
+go <- read_obo("go.obo", c("is_a","part_of") # http://geneontology.org/page/download-ontology
 anno <- read_gaf("goa_human.gaf") # http://geneontology.org/page/download-go-annotations
 
 go <- go %>%
@@ -42,7 +42,7 @@ snps <- read.plink("geno.bed", "geno.bim", "geno.fam")
 
 genemap <- make_genemap(snps$map, "hg19", maxgap=10e3)
 
-pc <- compute_term_pcs(go, snps$genotypes, genemap, npcs=4, num_threads=8)
+pc <- compute_term_pcs(go, snps$genotypes, genemap, npcs=4)
 
 saveRDS(pc, "term_pcs.rds") # warning: large file
 ```
