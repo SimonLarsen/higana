@@ -17,7 +17,7 @@ devtools::install_github("SimonLarsen/ontogwas")
 library(magrittr)
 library(ontogwas)
 
-go <- read_obo("go.obo", c("is_a","part_of") # http://geneontology.org/page/download-ontology
+go <- read_obo("go.obo", c("is_a","part_of")) # http://geneontology.org/page/download-ontology
 anno <- read_gaf("goa_human.gaf") # http://geneontology.org/page/download-go-annotations
 
 go <- go %>%
