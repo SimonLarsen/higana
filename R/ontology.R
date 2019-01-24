@@ -74,17 +74,22 @@ filter_obsolete.ontology <- function(o, keep_connected=TRUE) {
 #' e.g. 'biological process', 'cellular component' and 'molecular function' in Gene Ontology.
 #'
 #' @param o An \code{ontology} object.
-#' @param roots A character vector of roots to combine.
+#' @param roots A character vector of roots to combine. Will unite all roots in ontology if not provided.
 #' @param root.name Name of the new root term.
 #' @return The united \code{ontology} object.
 #' @export
 unite_roots <- function(o, roots, root.name="root") UseMethod("unite_roots")
 
 #' @export
-unite_roots.ontology <- function(o, roots, root.name="root") {
+unite_roots.ontology <- function(o, roots=NULL, root.name="root") {
   if(class(o) != "ontology") stop("o is not an ontology object.")
   if(root.name %fin% o$id) {
     stop(sprintf("Root name '%s' already exists in ontology.", root.name))
+  }
+
+  if(is.null(roots)) {
+    roots <- o$id[lengths(o$parents) == 0]
+    message("Uniting roots ", paste0(roots, collapse=", "))
   }
 
   for(root in roots) {
@@ -129,6 +134,7 @@ annotate.ontology <- function(o, annotations) {
 #' @importFrom igraph graph_from_data_frame
 #' @importFrom igraph topo_sort
 #' @importFrom igraph as_ids
+#' @importFrom fastmatch fmatch
 #' @export
 propagate_annotations <- function(o) UseMethod("propagate_annotations")
 
@@ -138,12 +144,13 @@ propagate_annotations.ontology <- function(o) {
 
   edges <- data.frame(from=rep(o$id, lengths(o$children)), to=unlist(o$children), stringsAsFactors=FALSE)
   g <- graph_from_data_frame(edges, directed=TRUE)
-  term_order <- as_ids(topo_sort(g, "out"))
+  term_order <- rev(as_ids(topo_sort(g, "out")))
+  term_i <- fmatch(term_order, o$id)
 
-  for(term in rev(term_order)) {
+  for(term in term_i) {
     ch <- o$children[[term]]
     if(length(ch) > 0) {
-      st <- Reduce(union, o$genes[ch])
+      st <- unique(do.call(c, o$genes[ch]))
       o$genes[[term]] <- union(o$genes[[term]], st)
     }
   }
@@ -154,6 +161,7 @@ propagate_annotations.ontology <- function(o) {
 #'
 #' @param o An annotated \code{ontology} object.
 #' @return A filtered \code{ontology} object.
+#' @importFrom fastmatch fmatch
 #' @export
 collapse_redundant_terms <- function(o) UseMethod("collapse_redundant_terms")
 
@@ -163,23 +171,28 @@ collapse_redundant_terms.ontology <- function(o) {
   if(is.null(o[["genes"]])) stop("Ontology is not annotated.")
 
   # Remove unannotated terms
-  o <- filter(o, o$id[lengths(o$genes) > 0])
+  o <- filter(o, o$id[lengths(o$genes) > 0], keep_connected=FALSE)
 
   # Identify redundant terms
-  redundant <- sapply(o$id, function(term) {
-    any(sapply(o$genes[o$children[[term]]], function(g) setequal(g, o$genes[[term]])))
+  setequal2 <- function(x, y) {
+    length(x) == length(y) && !anyNA(fmatch(x, y)) && !anyNA(fmatch(x, y))
+  }
+  terms_i <- which(lengths(o$children) > 0 & lengths(o$parents) > 0)
+  redundant <- sapply(terms_i, function(term) {
+    ch_i <- fmatch(o$children[[term]], o$id)
+    any(sapply(o$genes[ch_i], function(g) setequal2(g, o$genes[[term]])))
   })
 
   # Collapse terms
-  for(term in o$id[redundant]) {
-    for(parent in o$parents[[term]]) {
+  for(term in which(redundant)) {
+    for(parent in fmatch(o$parents[[term]], o$id)) {
       o$children[[parent]] <- union(o$children[[parent]], o$children[[term]])
     }
-    for(child in o$children[[term]]) {
+    for(child in fmatch(o$children[[term]], o$id)) {
       o$parents[[child]] <- union(o$parents[[child]], o$parents[[term]])
     }
   }
 
   # Remove collapsed terms from ontology
-  filter(o, o$id[!redundant])
+  filter(o, o$id[!redundant], keep_connected=FALSE)
 }

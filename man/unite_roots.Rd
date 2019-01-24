@@ -11,7 +11,7 @@ unite_roots(o, roots, root.name = "root")
 \arguments{
 \item{o}{An \code{ontology} object.}
 
-\item{roots}{A character vector of roots to combine.}
+\item{roots}{A character vector of roots to combine. Will unite all roots in ontology if not provided.}
 
 \item{root.name}{Name of the new root term.}
 }
