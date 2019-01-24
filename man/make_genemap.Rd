@@ -4,7 +4,7 @@
 \alias{make_genemap}
 \title{Create mapping from genes to SNPs.}
 \usage{
-make_genemap(snps, ref = "hg19", maxgap = 10000)
+make_genemap(snps, ref = "hg19", maxgap = 10000, select = "all")
 }
 \arguments{
 \item{snps}{A data frame mapping SNPs to genomic positions. Must have the columns "chromosome", "snp.name" and "position".}
@@ -12,6 +12,8 @@ make_genemap(snps, ref = "hg19", maxgap = 10000)
 \item{ref}{Reference genome. One of "hg18", "hg19", "hg38".}
 
 \item{maxgap}{Maximum allowed distance between SNP and gene.}
+
+\item{select}{How should SNPs near multiple genes by mapped? Use "all" to use all hits. Use "nearest" to use only nearest gene.}
 }
 \value{
 A data frame mapping genes to SNPs.
