@@ -13,5 +13,7 @@ collapse_redundant_terms(o)
 A filtered \code{ontology} object.
 }
 \description{
-Collapse terms whose annotations are redundant with respect to their children.
+Collapses non-root and non-leaf terms in the ontology whose annotations are redundant
+with respect to their children. Ensures that the annotations of a term is a proper superset
+of the union of annotations of its children.
 }

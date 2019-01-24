@@ -2,9 +2,7 @@
 % Please edit documentation in R/ontology.R
 \name{propagate_annotations}
 \alias{propagate_annotations}
-\title{Propagates annotations up through the hierarchy.
-After propagation the set of annotations for a term is a superset of the
-union of annotations for its children.}
+\title{Propagates annotations up through the hierarchy.}
 \usage{
 propagate_annotations(o)
 }
@@ -15,7 +13,6 @@ propagate_annotations(o)
 A propagated \code{ontology} object.
 }
 \description{
-Propagates annotations up through the hierarchy.
 After propagation the set of annotations for a term is a superset of the
-union of annotations for its children.
+union of annotations of its children.
 }

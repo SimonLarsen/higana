@@ -70,6 +70,7 @@ filter_obsolete.ontology <- function(o, keep_connected=TRUE) {
 }
 
 #' Unites a set of roots in the ontology under a common root.
+#'
 #' Primarily used to combine multiple aspects of an ontology,
 #' e.g. 'biological process', 'cellular component' and 'molecular function' in Gene Ontology.
 #'
@@ -125,8 +126,9 @@ annotate.ontology <- function(o, annotations) {
 }
 
 #' Propagates annotations up through the hierarchy.
+#'
 #' After propagation the set of annotations for a term is a superset of the
-#' union of annotations for its children.
+#' union of annotations of its children.
 #'
 #' @param o An \code{ontology} object.
 #' @return A propagated \code{ontology} object.
@@ -158,6 +160,10 @@ propagate_annotations.ontology <- function(o) {
 }
 
 #' Collapse terms whose annotations are redundant with respect to their children.
+#'
+#' Collapses non-root and non-leaf terms in the ontology whose annotations are redundant
+#' with respect to their children. Ensures that the annotations of a term is a proper superset
+#' of the union of annotations of its children.
 #'
 #' @param o An annotated \code{ontology} object.
 #' @return A filtered \code{ontology} object.

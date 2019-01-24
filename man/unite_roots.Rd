@@ -2,9 +2,7 @@
 % Please edit documentation in R/ontology.R
 \name{unite_roots}
 \alias{unite_roots}
-\title{Unites a set of roots in the ontology under a common root.
-Primarily used to combine multiple aspects of an ontology,
-e.g. 'biological process', 'cellular component' and 'molecular function' in Gene Ontology.}
+\title{Unites a set of roots in the ontology under a common root.}
 \usage{
 unite_roots(o, roots, root.name = "root")
 }
@@ -19,7 +17,6 @@ unite_roots(o, roots, root.name = "root")
 The united \code{ontology} object.
 }
 \description{
-Unites a set of roots in the ontology under a common root.
 Primarily used to combine multiple aspects of an ontology,
 e.g. 'biological process', 'cellular component' and 'molecular function' in Gene Ontology.
 }
