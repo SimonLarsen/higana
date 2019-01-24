@@ -2,8 +2,8 @@
 #'
 #' @param formula An object of class \code{formula}.
 #' @param covars A data frame containing covariates.
-#' @param o An \code{ontology} object.
 #' @param pc Named list of PCs from terms. Computed with \code{\link{compute_term_pcs}}.
+#' @param o An \code{ontology} object.
 #' @param npcs Number of PCs to use. Set of \code{Inf} to use all available.
 #' @param against Model to test against for significance. One of "whole.genome", "parent".
 #' @return A list with elements:
@@ -12,7 +12,7 @@
 #' @importFrom pbapply pblapply
 #' @importFrom fastmatch "%fin%"
 #' @export
-test_terms <- function(formula, covars, o, pc, npcs=Inf, against="whole.genome") {
+test_terms <- function(formula, covars, pc, o=NULL, npcs=Inf, against="whole.genome") {
   if(class(formula) != "formula") stop("formula is not a formula.")
   if(!("data.frame" %in% class(covars))) stop("covars is not a data frame.")
   if(any(grepl("TERM[0-9]+", colnames(covars)))) stop("Covariates named \"TERM[n]\" where [n] is number are not allowed.")
@@ -38,6 +38,10 @@ test_terms <- function(formula, covars, o, pc, npcs=Inf, against="whole.genome")
     })
   }
   else if(against == "parent") {
+    if(is.null(o)) {
+      stop("Ontology 'o' must be supplied when testing against parent.")
+    }
+
     edges <- data.frame(parent=rep(o$id, lengths(o$children)), child=unlist(o$children), stringsAsFactors=FALSE)
     edges <- subset(edges, parent %fin% names(pc) & child %fin% names(pc))
 

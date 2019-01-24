@@ -37,3 +37,30 @@ compute_term_pcs <- function(o, geno, genemap, npcs=4, max_term_size=Inf) {
 
   pc[!sapply(pc, is.null)]
 }
+
+#' Compute principal components of SNPs annotated to genes.
+#'
+#' @param geno A \code{SnpMatrix} genotype matrix.
+#' @param genemap A data frame mapping genes to SNP rs numbers.
+#' @param npcs Number of principal components to compute per gene.
+#' @return A list of matrices where each column corresponds to a PC.
+#' @export
+compute_gene_pcs <- function(geno, genemap, npcs=4) {
+  if(!("data.frame" %in% class(genemap))) {
+    stop("genemap is not a data frame.")
+  }
+  if(!("SnpMatrix" %in% class(geno))) {
+    stop("geno is not a SnpMatrix object.")
+  }
+
+  genes <- split(genemap$snp, genemap$gene)
+
+  message("Computing PCs.")
+  pc <- pblapply(genes, function(snps) tryCatch({
+    x <- as(geno[,snps], "numeric")
+    pc <- flashpca(x, npcs, "binom2", check_geno=FALSE, return_scale=FALSE, do_loadings=FALSE)
+    return(pc$vectors)
+  }, error=function(e) return(NULL)))
+
+  pc[!sapply(pc, is.null)]
+}
