@@ -5,7 +5,7 @@
 \title{Perform association test for all terms}
 \usage{
 test_terms(formula, covars, pc, o = NULL, npcs = Inf,
-  against = "whole.genome")
+  against = "none")
 }
 \arguments{
 \item{formula}{An object of class \code{formula}.}
@@ -18,7 +18,7 @@ test_terms(formula, covars, pc, o = NULL, npcs = Inf,
 
 \item{npcs}{Number of PCs to use. Set of \code{Inf} to use all available.}
 
-\item{against}{Model to test against for significance. One of "whole.genome", "parent".}
+\item{against}{Model to test against for significance. One of "none", "parent".}
 }
 \value{
 A list with elements:

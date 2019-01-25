@@ -5,14 +5,14 @@
 #' @param pc Named list of PCs from terms. Computed with \code{\link{compute_term_pcs}}.
 #' @param o An \code{ontology} object.
 #' @param npcs Number of PCs to use. Set of \code{Inf} to use all available.
-#' @param against Model to test against for significance. One of "whole.genome", "parent".
+#' @param against Model to test against for significance. One of "none", "parent".
 #' @return A list with elements:
 #'   \item{\code{test}}{Test objects for each term.}
 #'   \item{\code{pvalue}}{p-values for each term.}
 #' @importFrom pbapply pblapply
 #' @importFrom fastmatch "%fin%"
 #' @export
-test_terms <- function(formula, covars, pc, o=NULL, npcs=Inf, against="whole.genome") {
+test_terms <- function(formula, covars, pc, o=NULL, npcs=Inf, against="none") {
   if(class(formula) != "formula") stop("formula is not a formula.")
   if(!("data.frame" %in% class(covars))) stop("covars is not a data frame.")
   if(any(grepl("TERM[0-9]+", colnames(covars)))) stop("Covariates named \"TERM[n]\" where [n] is number are not allowed.")
@@ -20,9 +20,9 @@ test_terms <- function(formula, covars, pc, o=NULL, npcs=Inf, against="whole.gen
   if(npcs <= 0) stop("Number of principal components must be at least 1.")
   if(any(sapply(pc, is.null))) stop("Principal component vector contains NULL values.")
 
-  against <- match.arg(against, c("whole.genome","parent"))
+  against <- match.arg(against, c("none","parent"))
 
-  if(against == "whole.genome") {
+  if(against == "none") {
     fit <- glm(formula, covars, family=binomial("logit"), na.action=na.omit)
 
     tests <- pblapply(pc, function(term) {
