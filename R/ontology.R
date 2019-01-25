@@ -58,15 +58,32 @@ filter.ontology <- function(o, terms, keep_connected=TRUE) {
 #' Removes obsolete terms from the ontology.
 #'
 #' @param o An \code{ontology} object.
-#' @param keep_connected Don't remove ancestors of terms in \code{terms}.
-#' @return The filtered ontology.
+#' @param keep_connected Keep obsolete terms that are ancestors of non-obsolete terms.
+#' @return An ontology with all obsolete terms removed.
 #' @export
 filter_obsolete <- function(o, keep_connected=TRUE) UseMethod("filter_obsolete")
 
 #' @export
 filter_obsolete.ontology <- function(o, keep_connected=TRUE) {
+  if(class(o) != "ontology") stop("o is not an ontology object.")
   terms <- o$id[!o$obsolete]
-  filter.ontology(o, terms)
+  filter.ontology(o, terms, keep_connected=TRUE)
+}
+
+#' Removes unannotated terms from the ontology.
+#'
+#' @param o An annotated \code{ontology} object.
+#' @param keep_connected Keep unannotated terms that are ancestors of annotated terms.
+#' @return An ontology with all unannotated terms removed.
+#' @export
+filter_unannotated <- function(o, keep_connected=TRUE) UseMethod("filter_unannotated")
+
+#' @export
+filter_unannotated.ontology <- function(o, keep_connected=TRUE) {
+  if(class(o) != "ontology") stop("o is not an ontology object.")
+  if(is.null(o[["genes"]])) stop("Ontology is not annotated.")
+  terms <- o$id[lengths(o$genes) > 0]
+  filter.ontology(o, terms, keep_connected=TRUE)
 }
 
 #' Unites a set of roots in the ontology under a common root.
@@ -89,7 +106,7 @@ unite_roots.ontology <- function(o, roots=NULL, root.name="root") {
   }
 
   if(is.null(roots)) {
-    roots <- o$id[lengths(o$parents) == 0]
+    roots <- unname(o$id[lengths(o$parents) == 0])
     message("Uniting roots ", paste0(roots, collapse=", "))
   }
 
@@ -143,6 +160,7 @@ propagate_annotations <- function(o) UseMethod("propagate_annotations")
 #' @export
 propagate_annotations.ontology <- function(o) {
   if(class(o) != "ontology") stop("o is not an ontology object.")
+  if(is.null(o[["genes"]])) stop("Ontology is not annotated.")
 
   edges <- data.frame(from=rep(o$id, lengths(o$children)), to=unlist(o$children), stringsAsFactors=FALSE)
   g <- graph_from_data_frame(edges, directed=TRUE)
@@ -153,7 +171,7 @@ propagate_annotations.ontology <- function(o) {
     ch <- o$children[[term]]
     if(length(ch) > 0) {
       st <- unique(do.call(c, o$genes[ch]))
-      o$genes[[term]] <- union(o$genes[[term]], st)
+      o$genes[[term]] <- base::union(o$genes[[term]], st)
     }
   }
   return(o)
@@ -177,7 +195,7 @@ collapse_redundant_terms.ontology <- function(o) {
   if(is.null(o[["genes"]])) stop("Ontology is not annotated.")
 
   # Remove unannotated terms
-  o <- filter(o, o$id[lengths(o$genes) > 0], keep_connected=FALSE)
+  o <- filter.ontology(o, o$id[lengths(o$genes) > 0], keep_connected=FALSE)
 
   # Identify redundant terms
   setequal2 <- function(x, y) {
@@ -192,13 +210,38 @@ collapse_redundant_terms.ontology <- function(o) {
   # Collapse terms
   for(term in which(redundant)) {
     for(parent in fmatch(o$parents[[term]], o$id)) {
-      o$children[[parent]] <- union(o$children[[parent]], o$children[[term]])
+      o$children[[parent]] <- base::union(o$children[[parent]], o$children[[term]])
     }
     for(child in fmatch(o$children[[term]], o$id)) {
-      o$parents[[child]] <- union(o$parents[[child]], o$parents[[term]])
+      o$parents[[child]] <- base::union(o$parents[[child]], o$parents[[term]])
     }
   }
 
   # Remove collapsed terms from ontology
-  filter(o, o$id[!redundant], keep_connected=FALSE)
+  filter.ontology(o, o$id[!redundant], keep_connected=FALSE)
+}
+
+#' Permutes the hierarchy of an ontology while preserving the in- and out-degree of each terms.
+#'
+#' @param An \code{ontology} object.
+#' @export
+permute <- function(o) UseMethod("permute")
+
+#' @importFrom igraph graph_from_data_frame
+#' @importFrom igraph rewire
+#' @importFrom igraph keeping_degseq
+#' @export
+permute.ontology <- function(o) {
+  if(class(o) != "ontology") stop("o is not an ontology object.")
+
+  edges <- data.frame(from=rep(o$id, lengths(o$children)), to=unlist(o$children), stringsAsFactors=FALSE)
+  g <- graph_from_data_frame(edges, directed=TRUE)
+  g2 <- rewire(g, with=keeping_degseq(loops=FALSE, niter=vcount(g)*100))
+  el <- get.edgelist(g2)
+  el <- split(el[,2], el[,1])
+
+  o$children <- setNames(el[o$id], o$id)
+  missing <- sapply(o$children, is.null)
+  o$children[missing] <- list(character(0))
+  o
 }

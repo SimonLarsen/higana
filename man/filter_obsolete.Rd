@@ -9,10 +9,10 @@ filter_obsolete(o, keep_connected = TRUE)
 \arguments{
 \item{o}{An \code{ontology} object.}
 
-\item{keep_connected}{Don't remove ancestors of terms in \code{terms}.}
+\item{keep_connected}{Keep obsolete terms that are ancestors of non-obsolete terms.}
 }
 \value{
-The filtered ontology.
+An ontology with all obsolete terms removed.
 }
 \description{
 Removes obsolete terms from the ontology.
