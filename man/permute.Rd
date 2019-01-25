@@ -2,13 +2,17 @@
 % Please edit documentation in R/ontology.R
 \name{permute}
 \alias{permute}
-\title{Permutes the hierarchy of an ontology while preserving the in- and out-degree of each terms.}
+\title{Permute an ontology.}
 \usage{
-permute(o)
+permute(o, method = "hierarchy", bins = 100)
 }
 \arguments{
+\item{method}{Permutation method. "hierarchy" permutes the relationships in the hierarchy, while preserving the in- and out-degree of each term.}
+
+\item{bins}{Number of bins to use for method="annotations".}
+
 \item{An}{\code{ontology} object.}
 }
 \description{
-Permutes the hierarchy of an ontology while preserving the in- and out-degree of each terms.
+Permute an ontology.
 }

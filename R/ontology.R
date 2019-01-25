@@ -221,27 +221,45 @@ collapse_redundant_terms.ontology <- function(o) {
   filter.ontology(o, o$id[!redundant], keep_connected=FALSE)
 }
 
-#' Permutes the hierarchy of an ontology while preserving the in- and out-degree of each terms.
+#' Permute an ontology.
 #'
 #' @param An \code{ontology} object.
+#' @param method Permutation method. "hierarchy" permutes the relationships in the hierarchy, while preserving the in- and out-degree of each term.
+#' @param bins Number of bins to use for method="annotations".
 #' @export
-permute <- function(o) UseMethod("permute")
+permute <- function(o, method="hierarchy", bins=100) UseMethod("permute")
 
 #' @importFrom igraph graph_from_data_frame
 #' @importFrom igraph rewire
 #' @importFrom igraph keeping_degseq
 #' @export
-permute.ontology <- function(o) {
+permute.ontology <- function(o, method="hierarchy", bins=100) {
   if(class(o) != "ontology") stop("o is not an ontology object.")
 
-  edges <- data.frame(from=rep(o$id, lengths(o$children)), to=unlist(o$children), stringsAsFactors=FALSE)
-  g <- graph_from_data_frame(edges, directed=TRUE)
-  g2 <- rewire(g, with=keeping_degseq(loops=FALSE, niter=vcount(g)*100))
-  el <- get.edgelist(g2)
-  el <- split(el[,2], el[,1])
+  method <- match.arg(method, c("hierarchy","annotations"))
 
-  o$children <- setNames(el[o$id], o$id)
-  missing <- sapply(o$children, is.null)
-  o$children[missing] <- list(character(0))
-  o
+  if(method == "hierarchy") {
+    edges <- data.frame(from=rep(o$id, lengths(o$children)), to=unlist(o$children), stringsAsFactors=FALSE)
+    g <- graph_from_data_frame(edges, directed=TRUE)
+    g2 <- rewire(g, with=keeping_degseq(loops=FALSE, niter=vcount(g)*100))
+    el <- get.edgelist(g2)
+    el <- split(el[,2], el[,1])
+
+    o$children <- setNames(el[o$id], o$id)
+    missing <- sapply(o$children, is.null)
+    o$children[missing] <- list(character(0))
+    return(o)
+  }
+  else if(method == "annotations") {
+    sizes <- data.frame(term=o$id, genes=lengths(o$genes), stringsAsFactors=FALSE)
+    sizes <- sizes[order(sizes$genes),]
+    sizes$bin <- floor(seq(1, bins+1-1/nrow(sizes), length.out=nrow(sizes)))
+    term.bins <- split(sizes$term, sizes$bin)
+    for(bin in term.bins) {
+      if(max(lengths(o$genes[bin])) > 0) {
+        o$genes[bin] <- setNames(o$genes[sample(bin)], bin)
+      }
+    }
+    return(o)
+  }
 }
