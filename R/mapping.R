@@ -4,23 +4,42 @@
 #' @param ref Reference genome. One of "hg18", "hg19", "hg38".
 #' @param maxgap Maximum allowed distance between SNP and gene.
 #' @param select How should SNPs near multiple genes by mapped? Use "all" to use all hits. Use "nearest" to use only nearest gene.
+#' @param permute Permutation method. Use "none" for no permutation. "name" randomly shuffles gene names. "preserve.size" shuffles genes within bins of similar size.
+#' @param bins Number of bins to use for permute = "preserve.size".
 #' @return A data frame mapping genes to SNPs.
 #' @importFrom GenomicRanges makeGRangesFromDataFrame
 #' @importFrom GenomicRanges findOverlaps
 #' @export
-make_genemap <- function(snps, ref="hg19", maxgap=10e3, select="all") {
+make_genemap <- function(snps, ref="hg19", maxgap=10e3, select="all", permute="none", bins=100) {
   if(is.null(genes[[ref]])) {
     stop("Unknown reference genome build \"", ref, "\".")
   }
   select <- match.arg(select, c("all","nearest"))
+
+  glist <- genes[[ref]]
+
+  permute <- match.arg(permute, c("none", "name", "preserve.size"))
+  if(permute == "name") {
+    glist$name <- sample(glist$name)
+  }
+  else if(permute == "preserve.size") {
+    bins <- 100
+    glist$size <- glist$end - glist$start + 1
+    glist <- glist[order(glist$size),]
+
+    glist$bin <- floor(seq(1, bins+1-1/nrow(glist), length.out=nrow(glist)))
+    glist.bins <- split(glist, glist$bin)
+    glist.bins <- lapply(glist.bins, function(b) { b$name <- sample(b$name); b })
+    glist <- do.call(rbind, glist.bins)
+  }
+
+  gene_ranges <- makeGRangesFromDataFrame(glist, keep.extra.columns=TRUE, ignore.strand=TRUE)
 
   snp_ranges <- makeGRangesFromDataFrame(
     snps,
     start.field="position", end.field="position",
     keep.extra.columns=TRUE, ignore.strand=TRUE
   )
-
-  gene_ranges <- makeGRangesFromDataFrame(genes[[ref]], keep.extra.columns=TRUE, ignore.strand=TRUE)
 
   hits <- findOverlaps(snp_ranges, gene_ranges, maxgap=maxgap, select="all")
 
