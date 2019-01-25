@@ -275,11 +275,16 @@ permute.ontology <- function(o, method="hierarchy", bins=100) {
     g <- graph_from_data_frame(edges, directed=TRUE)
     g2 <- rewire(g, with=keeping_degseq(loops=FALSE, niter=vcount(g)*100))
     el <- get.edgelist(g2)
-    el <- split(el[,2], el[,1])
 
-    o$children <- setNames(el[o$id], o$id)
-    missing <- sapply(o$children, is.null)
-    o$children[missing] <- list(character(0))
+    parents <- split(el[,1], el[,2])
+    children <- split(el[,2], el[,1])
+
+    o$parents <- setNames(parents[o$id], o$id)
+    o$parents[sapply(o$parents, is.null)] <- list(character(0))
+
+    o$children <- setNames(children[o$id], o$id)
+    o$children[sapply(o$children, is.null)] <- list(character(0))
+
     return(o)
   }
   else if(method == "annotations") {
