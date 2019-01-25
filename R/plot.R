@@ -4,13 +4,14 @@
 #' @param terms Terms to include in plot.
 #' @param include_ancestors Include the ancestors of terms in the plot.
 #' @param pvalues A named numeric vector of p-values for each term. Term nodes will be colored according to -log10(p-value) if provided.
+#' @param ... Further arguments to \code{\link{ontologyPlot::onto_plot}}.
 #' @export
-plot <- function(o, terms, include_ancestors=TRUE, pvalues=NULL) UseMethod("plot")
+plot_subtree <- function(o, terms, include_ancestors=TRUE, pvalues=NULL, ...) UseMethod("plot_subtree")
 
 #' @importFrom ontologyPlot onto_plot
 #' @importFrom circlize colorRamp2
 #' @export
-plot.ontology <- function(o, terms, include_ancestors=TRUE, pvalues=NULL) {
+plot_subtree.ontology <- function(o, terms, include_ancestors=TRUE, pvalues=NULL, ...) {
   if(class(o) != "ontology") stop("o is not an ontology object.")
 
   if(include_ancestors) {
@@ -30,5 +31,5 @@ plot.ontology <- function(o, terms, include_ancestors=TRUE, pvalues=NULL) {
 
   plot.new()
   par(mar=c(0,0,0,0), bg="white")
-  onto_plot(o, terms, fillcolor=fillcolor)
+  onto_plot(o, terms, fillcolor=fillcolor, ...)
 }
