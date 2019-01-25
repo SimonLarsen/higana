@@ -179,6 +179,36 @@ propagate_annotations.ontology <- function(o) {
   return(o)
 }
 
+#' Recomputes \code{ancestors} field for each term.
+#'
+#' This method can be used to repair the ontology after changing the \code{children} or \code{parents} fields.
+#'
+#' @param o An \code{ontology} object.
+#' @importFrom igraph graph_from_data_frame
+#' @importFrom igraph topo_sort
+#' @importFrom igraph as_ids
+#' @importFrom fastmatch fmatch
+#' @export
+recompute_ancestors <- function(o) UseMethod("recompute_ancestors")
+
+#' @export
+recompute_ancestors.ontology <- function(o) {
+  if(class(o) != "ontology") stop("o is not an ontology object.")
+
+  edges <- data.frame(from=rep(o$id, lengths(o$children)), to=unlist(o$children), stringsAsFactors=FALSE)
+  g <- graph_from_data_frame(edges, directed=TRUE)
+  term_order <- as_ids(topo_sort(g, "out"))
+  term_i <- fmatch(term_order, o$id)
+
+  o$ancestors <- setNames(rep(list(character(0)), length(o$id)), o$id)
+  for(term in term_order) {
+    anc <- unique(unname(do.call(c, o$ancestors[fmatch(o$parents[[term]], o$id)])))
+    o$ancestors[[fmatch(term, o$id)]] <- c(o$id[fmatch(term, o$id)], anc)
+  }
+  o$ancestors <- o$ancestors[fmatch(o$id, names(o$ancestors))]
+  return(o)
+}
+
 #' Collapse terms whose annotations are redundant with respect to their children.
 #'
 #' Collapses non-root and non-leaf terms in the ontology whose annotations are redundant
