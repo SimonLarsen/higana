@@ -129,6 +129,7 @@ unite_roots.ontology <- function(o, roots=NULL, root.name="root") {
 #' @param o An \code{ontology} object.
 #' @param annotations A named list of character vectors.
 #' @return An \code{ontology} object with annotations.
+#' @importFrom fastmatch fmatch
 #' @export
 annotate <- function(o, annotation) UseMethod("annotate")
 
@@ -137,7 +138,8 @@ annotate.ontology <- function(o, annotations) {
   if(class(o) != "ontology") stop("o is not an ontology object.")
   if(class(annotations) != "list") stop("annotations is not a list")
 
-  o$genes <- setNames(annotations[o$id], o$id)
+  indices <- fmatch(o$id, names(annotations))
+  o$genes <- setNames(annotations[indices], o$id)
   o$genes[sapply(o$genes, is.null)] <- list(character(0))
   return(o)
 }
@@ -226,12 +228,12 @@ collapse_redundant_terms.ontology <- function(o) {
 #' @param An \code{ontology} object.
 #' @param method Permutation method. "hierarchy" permutes the relationships in the hierarchy, while preserving the in- and out-degree of each term.
 #' @param bins Number of bins to use for method="annotations".
-#' @export
-permute <- function(o, method="hierarchy", bins=100) UseMethod("permute")
-
 #' @importFrom igraph graph_from_data_frame
 #' @importFrom igraph rewire
 #' @importFrom igraph keeping_degseq
+#' @export
+permute <- function(o, method="hierarchy", bins=100) UseMethod("permute")
+
 #' @export
 permute.ontology <- function(o, method="hierarchy", bins=100) {
   if(class(o) != "ontology") stop("o is not an ontology object.")
