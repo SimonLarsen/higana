@@ -4,10 +4,13 @@
 \alias{permute}
 \title{Permute an ontology.}
 \usage{
-permute(o, method = "hierarchy", bins = 100)
+permute(o, method = "hierarchy", recompute_ancestors = TRUE,
+  bins = 100)
 }
 \arguments{
 \item{method}{Permutation method. "hierarchy" permutes the relationships in the hierarchy, while preserving the in- and out-degree of each term.}
+
+\item{recompute_ancestors}{Should ancestors field be recomputed after perturbation?}
 
 \item{bins}{Number of bins to use for method="annotations".}
 

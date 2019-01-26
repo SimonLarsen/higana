@@ -257,15 +257,16 @@ collapse_redundant_terms.ontology <- function(o) {
 #'
 #' @param An \code{ontology} object.
 #' @param method Permutation method. "hierarchy" permutes the relationships in the hierarchy, while preserving the in- and out-degree of each term.
+#' @param recompute_ancestors Should ancestors field be recomputed after perturbation?
 #' @param bins Number of bins to use for method="annotations".
 #' @importFrom igraph graph_from_data_frame
 #' @importFrom igraph rewire
 #' @importFrom igraph keeping_degseq
 #' @export
-permute <- function(o, method="hierarchy", bins=100) UseMethod("permute")
+permute <- function(o, method="hierarchy", recompute_ancestors=TRUE, bins=100) UseMethod("permute")
 
 #' @export
-permute.ontology <- function(o, method="hierarchy", bins=100) {
+permute.ontology <- function(o, method="hierarchy", recompute_ancestors=TRUE, bins=100) {
   if(class(o) != "ontology") stop("o is not an ontology object.")
 
   method <- match.arg(method, c("hierarchy","annotations"))
@@ -285,6 +286,7 @@ permute.ontology <- function(o, method="hierarchy", bins=100) {
     o$children <- setNames(children[o$id], o$id)
     o$children[sapply(o$children, is.null)] <- list(character(0))
 
+    if(recompute_ancestors) o <- recompute_ancestors.ontology(o)
     return(o)
   }
   else if(method == "annotations") {
