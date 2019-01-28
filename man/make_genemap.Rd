@@ -16,7 +16,7 @@ make_genemap(snps, ref = "hg19", maxgap = 10000, select = "all",
 
 \item{select}{How should SNPs near multiple genes by mapped? Use "all" to use all hits. Use "nearest" to use only nearest gene.}
 
-\item{permute}{Permutation method. Use "none" for no permutation. "name" randomly shuffles gene names. "preserve.size" shuffles genes within bins of similar size.}
+\item{permute}{Permutation method. Use "none" for no permutation. "all" randomly shuffles all gene names. "binned" shuffles gene names within bins of similar gene size.}
 
 \item{bins}{Number of bins to use for permute = "preserve.size".}
 }

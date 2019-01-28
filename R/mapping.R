@@ -4,7 +4,7 @@
 #' @param ref Reference genome. One of "hg18", "hg19", "hg38".
 #' @param maxgap Maximum allowed distance between SNP and gene.
 #' @param select How should SNPs near multiple genes by mapped? Use "all" to use all hits. Use "nearest" to use only nearest gene.
-#' @param permute Permutation method. Use "none" for no permutation. "name" randomly shuffles gene names. "preserve.size" shuffles genes within bins of similar size.
+#' @param permute Permutation method. Use "none" for no permutation. "all" randomly shuffles all gene names. "binned" shuffles gene names within bins of similar gene size.
 #' @param bins Number of bins to use for permute = "preserve.size".
 #' @return A data frame mapping genes to SNPs.
 #' @importFrom GenomicRanges makeGRangesFromDataFrame
@@ -18,11 +18,11 @@ make_genemap <- function(snps, ref="hg19", maxgap=10e3, select="all", permute="n
 
   glist <- genes[[ref]]
 
-  permute <- match.arg(permute, c("none", "name", "preserve.size"))
-  if(permute == "name") {
+  permute <- match.arg(permute, c("none", "all", "binned"))
+  if(permute == "all") {
     glist$name <- sample(glist$name)
   }
-  else if(permute == "preserve.size") {
+  else if(permute == "binned") {
     bins <- 100
     glist$size <- glist$end - glist$start + 1
     glist <- glist[order(glist$size),]

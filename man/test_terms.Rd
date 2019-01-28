@@ -2,7 +2,7 @@
 % Please edit documentation in R/assoc.R
 \name{test_terms}
 \alias{test_terms}
-\title{Perform association test for all terms}
+\title{Perform association test for terms.}
 \usage{
 test_terms(formula, covars, pc, o = NULL, npcs = Inf,
   against = "none")
@@ -16,7 +16,7 @@ test_terms(formula, covars, pc, o = NULL, npcs = Inf,
 
 \item{o}{An \code{ontology} object.}
 
-\item{npcs}{Number of PCs to use. Set of \code{Inf} to use all available.}
+\item{npcs}{Number of PCs to use. Set to \code{Inf} to use all available.}
 
 \item{against}{Model to test against for significance. One of "none", "parent".}
 }
@@ -26,5 +26,5 @@ A list with elements:
   \item{\code{pvalue}}{p-values for each term.}
 }
 \description{
-Perform association test for all terms
+Perform association test for terms.
 }

@@ -1,10 +1,10 @@
-#' Perform association test for all terms
+#' Perform association test for terms.
 #'
 #' @param formula An object of class \code{formula}.
 #' @param covars A data frame containing covariates.
 #' @param pc Named list of PCs from terms. Computed with \code{\link{compute_term_pcs}}.
 #' @param o An \code{ontology} object.
-#' @param npcs Number of PCs to use. Set of \code{Inf} to use all available.
+#' @param npcs Number of PCs to use. Set to \code{Inf} to use all available.
 #' @param against Model to test against for significance. One of "none", "parent".
 #' @return A list with elements:
 #'   \item{\code{test}}{Test objects for each term.}
@@ -69,4 +69,18 @@ test_terms <- function(formula, covars, pc, o=NULL, npcs=Inf, against="none") {
 
   pvalues <- sapply(tests, function(t) t$`Pr(>Chi)`[2])
   return(list(test=tests, pvalue=pvalues))
+}
+
+#' Perform association test for genes.
+#'
+#' @param formula An object of class \code{formula}.
+#' @param covars A data frame containing covariates.
+#' @param pc Named list of PCs from genes. Computed with \code{\link{compute_gene_pcs}}.
+#' @param npcs Number of PCs to use. Set to \code{Inf} to use all available.
+#' @return A list with elements:
+#'   \item{\code{test}}{Test objects for each gene.}
+#'   \item{\code{pvalue}}{p-values for each gene.}
+#' @export
+test_genes <- function(formula, covars, pc, npcs=Inf) {
+  test_terms(formula, covars, pc, npcs=npcs)
 }
