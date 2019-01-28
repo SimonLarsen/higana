@@ -6,6 +6,8 @@ Authors@R: person("Simon Jonas", "Larsen", email="simonhffh@gmail.com", role=c("
 Maintainer: Simon J. Larsen <simonhffh@gmail.com>
 Description: Add a description here.
 License: MIT + file LICENSE
+URL: https://github.com/SimonLarsen/ontogwas
+BugReports: https://github.com/SimonLarsen/ontogwas/issues
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
