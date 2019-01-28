@@ -4,8 +4,8 @@
 \alias{compute_term_pcs}
 \title{Compute principal components of SNPs annotated to ontology terms.}
 \usage{
-compute_term_pcs(o, geno, genemap, npcs = 4, max_term_size = Inf,
-  stand = "binom2", ...)
+compute_term_pcs(o, geno, genemap, npcs = 4, terms = NULL,
+  max_term_size = Inf, stand = "binom2", ...)
 }
 \arguments{
 \item{o}{An annotated \code{ontology} object.}
@@ -15,6 +15,8 @@ compute_term_pcs(o, geno, genemap, npcs = 4, max_term_size = Inf,
 \item{genemap}{A data frame mapping genes to SNP rs numbers.}
 
 \item{npcs}{Number of principal components to compute per term.}
+
+\item{terms}{A character vector of terms to compute PCs for. Will use all terms if not provided.}
 
 \item{max_term_size}{Skip terms annotated with more than this number of genes.}
 

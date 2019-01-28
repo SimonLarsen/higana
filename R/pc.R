@@ -4,6 +4,7 @@
 #' @param geno A \code{SnpMatrix} genotype matrix.
 #' @param genemap A data frame mapping genes to SNP rs numbers.
 #' @param npcs Number of principal components to compute per term.
+#' @param terms A character vector of terms to compute PCs for. Will use all terms if not provided.
 #' @param max_term_size Skip terms annotated with more than this number of genes.
 #' @param stand Which standardization method to use. One of "none", "binom" (old Eigenstrat-style), "binom2" (new Eigenstrat-style), "sd" (zero-mean unit-variance) or "center" (zero mean).
 #' @param ... Further arguments to \code{\link{flashpcaR::flashpca}}.
@@ -12,7 +13,7 @@
 #' @importFrom pbapply pblapply
 #' @return A list of matrices where each column corresponds to a PC.
 #' @export
-compute_term_pcs <- function(o, geno, genemap, npcs=4, max_term_size=Inf, stand="binom2", ...) {
+compute_term_pcs <- function(o, geno, genemap, npcs=4, terms=NULL, max_term_size=Inf, stand="binom2", ...) {
   if(class(o) != "ontology") {
     stop("o is not an ontology object.")
   }
@@ -23,7 +24,12 @@ compute_term_pcs <- function(o, geno, genemap, npcs=4, max_term_size=Inf, stand=
     stop("geno is not a SnpMatrix object.")
   }
 
+  # use all terms if not provided
+  if(is.null(terms)) terms <- o$id
+
+  # restrict to terms below max_term_size
   terms <- o$id[lengths(o$genes) <= max_term_size]
+
   message("Extracting gene SNPs.")
   term_snps <- pblapply(setNames(terms, terms), function(term) {
     as.character(unique(genemap[genemap$gene %fin% o$genes[[term]], "snp"]))
