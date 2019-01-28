@@ -256,41 +256,32 @@ collapse_redundant_terms.ontology <- function(o) {
 #' Permute an ontology.
 #'
 #' @param An \code{ontology} object.
-#' @param method Permutation method. "hierarchy" permutes the relationships in the hierarchy, while preserving the in- and out-degree of each term.
-#' @param recompute_ancestors Should ancestors field be recomputed after perturbation?
-#' @param bins Number of bins to use for method="annotations".
+#' @param method Permutation method.
+#'     "genes" assigns random genes to each term while preserving the number of annotations per term
+#'     and total occurences of each gene.
+#'     "sets" shuffle whole annotate sets among terms with similar number of annotations.
+#' @param recompute_ancestors Should \code{ancestors} field be recomputed after perturbation?
+#' @param bins Number of bins to use for method="sets".
 #' @importFrom igraph graph_from_data_frame
 #' @importFrom igraph rewire
 #' @importFrom igraph keeping_degseq
 #' @export
-permute <- function(o, method="hierarchy", recompute_ancestors=TRUE, bins=100) UseMethod("permute")
+permute <- function(o, method="genes", recompute_ancestors=TRUE, bins=100) UseMethod("permute")
 
 #' @export
-permute.ontology <- function(o, method="hierarchy", recompute_ancestors=TRUE, bins=100) {
+permute.ontology <- function(o, method="genes", recompute_ancestors=TRUE, bins=100) {
   if(class(o) != "ontology") stop("o is not an ontology object.")
 
-  method <- match.arg(method, c("hierarchy","annotations"))
+  method <- match.arg(method, c("genes","sets"))
 
-  if(method == "hierarchy") {
-    edges <- data.frame(from=rep(o$id, lengths(o$children)), to=unlist(o$children), stringsAsFactors=FALSE)
-    g <- graph_from_data_frame(edges, directed=TRUE)
-    g2 <- rewire(g, with=keeping_degseq(loops=FALSE, niter=vcount(g)*100))
-    el <- get.edgelist(g2)
-
-    parents <- split(el[,1], el[,2])
-    children <- split(el[,2], el[,1])
-
-    o$parents <- setNames(parents[o$id], o$id)
-    o$parents[sapply(o$parents, is.null)] <- list(character(0))
-
-    o$children <- setNames(children[o$id], o$id)
-    o$children[sapply(o$children, is.null)] <- list(character(0))
-
-    if(recompute_ancestors) o <- recompute_ancestors.ontology(o)
-    return(o)
+  if(method == "genes") {
+    m <- data.frame(term=rep(o$id, lengths(o$genes)), gene=unlist(o$genes), stringsAsFactors=FALSE, row.names=NULL)
+    m$gene <- sample(m$gene)
+    anno <- split(m$gene, m$term)
+    return(annotate(o, anno))
   }
-  else if(method == "annotations") {
-    sizes <- data.frame(term=o$id, genes=lengths(o$genes), stringsAsFactors=FALSE)
+  else if(method == "sets") {
+    sizes <- data.frame(term=o$id, genes=lengths(o$genes), stringsAsFactors=FALSE, row.names=FALSE)
     sizes <- sizes[order(sizes$genes),]
     sizes$bin <- floor(seq(1, bins+1-1/nrow(sizes), length.out=nrow(sizes)))
     term.bins <- split(sizes$term, sizes$bin)

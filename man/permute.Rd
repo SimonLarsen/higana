@@ -4,15 +4,17 @@
 \alias{permute}
 \title{Permute an ontology.}
 \usage{
-permute(o, method = "hierarchy", recompute_ancestors = TRUE,
-  bins = 100)
+permute(o, method = "genes", recompute_ancestors = TRUE, bins = 100)
 }
 \arguments{
-\item{method}{Permutation method. "hierarchy" permutes the relationships in the hierarchy, while preserving the in- and out-degree of each term.}
+\item{method}{Permutation method.
+"genes" assigns random genes to each term while preserving the number of annotations per term
+and total occurences of each gene.
+"sets" shuffle whole annotate sets among terms with similar number of annotations.}
 
-\item{recompute_ancestors}{Should ancestors field be recomputed after perturbation?}
+\item{recompute_ancestors}{Should \code{ancestors} field be recomputed after perturbation?}
 
-\item{bins}{Number of bins to use for method="annotations".}
+\item{bins}{Number of bins to use for method="sets".}
 
 \item{An}{\code{ontology} object.}
 }
