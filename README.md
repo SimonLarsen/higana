@@ -22,8 +22,9 @@ anno <- read_gaf("goa_human.gaf") # http://geneontology.org/page/download-go-ann
 
 go <- go %>%
   filter_obsolete() %>%
-  unite_roots(c("GO:0008150","GO:0003674","GO:0005575")) %>%
+  unite_roots() %>%
   annotate(anno) %>%
+  filter_unannotated() %>%
   propagate_annotations() %>%
   collapse_redundant_terms()
 
@@ -56,6 +57,6 @@ go <- readRDS("ontology.rds")
 pc <- readRDS("term_pcs.rds")
 covars <- read.table("covars.tsv")
 
-results <- test_terms(class ~ sex + age + PC1 + PC2, covars, go, pc, npcs=4, against="whole.genome")
+results <- test_terms(class ~ sex + age + PC1 + PC2, covars, go, pc, npcs=4)
 signif.terms <- which(p.adjust(results$pvalue, method="BH") < 0.05)
 ```
