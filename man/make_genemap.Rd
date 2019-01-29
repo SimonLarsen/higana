@@ -10,7 +10,7 @@ make_genemap(snps, ref = "hg19", maxgap = 10000, select = "all",
 \arguments{
 \item{snps}{A data frame mapping SNPs to genomic positions. Must have the columns "chromosome", "snp.name" and "position".}
 
-\item{ref}{Reference genome. One of "hg18", "hg19", "hg38".}
+\item{ref}{Reference genome. One of "hg18", "hg19", "hg38", "mm8", "mm9", "mm10", "rn5", "rn6".}
 
 \item{maxgap}{Maximum allowed distance between SNP and gene.}
 

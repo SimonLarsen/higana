@@ -1,7 +1,7 @@
 #' Create mapping from genes to SNPs.
 #'
 #' @param snps A data frame mapping SNPs to genomic positions. Must have the columns "chromosome", "snp.name" and "position".
-#' @param ref Reference genome. One of "hg18", "hg19", "hg38".
+#' @param ref Reference genome. One of "hg18", "hg19", "hg38", "mm8", "mm9", "mm10", "rn5", "rn6".
 #' @param maxgap Maximum allowed distance between SNP and gene.
 #' @param select How should SNPs near multiple genes by mapped? Use "all" to use all hits. Use "nearest" to use only nearest gene.
 #' @param permute Permutation method. Use "none" for no permutation. "all" randomly shuffles all gene names. "binned" shuffles gene names within bins of similar gene size.
