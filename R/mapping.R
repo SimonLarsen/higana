@@ -6,7 +6,7 @@
 #' @param select How should SNPs near multiple genes by mapped? Use "all" to use all hits. Use "nearest" to use only nearest gene.
 #' @param permute Permutation method.
 #'     Use "none" for no permutation.
-#'     "snps" randomly assigns SNPs to genes, preserving the frequency of each SNP.
+#'     "snps" randomly assigns SNPs to genes, while preserving the frequency of each SNP and number of SNPs assigned to each gene.
 #'     "genes" randomly shuffles gene locations among all genes.
 #'     "genes.binned" shuffles gene locations within bins of similar gene size.
 #' @param bins Number of bins to use for permute = "genes.binned".
