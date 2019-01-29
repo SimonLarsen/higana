@@ -6,6 +6,11 @@ Ontology-based analysis of genomic variants.
 ## Installation
 
 ```r
+source("https://bioconductor.org/biocLite.R")
+biocLite(c("GenomicRanges", "Rgraphviz"))
+
+devtools::install_github("gabraham/flashpca/flashpcaR")
+
 devtools::install_github("SimonLarsen/ontogwas")
 ```
 
