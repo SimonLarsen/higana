@@ -28,7 +28,7 @@ compute_term_pcs <- function(o, geno, genemap, npcs=4, terms=NULL, max_term_size
   if(is.null(terms)) terms <- o$id
 
   # restrict to terms below max_term_size
-  terms <- o$id[lengths(o$genes) <= max_term_size]
+  terms <- intersect(terms, o$id[lengths(o$genes) <= max_term_size])
 
   message("Extracting gene SNPs.")
   term_snps <- pblapply(setNames(terms, terms), function(term) {
