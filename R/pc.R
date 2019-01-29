@@ -44,6 +44,8 @@ compute_term_pcs <- function(o, geno, genemap, npcs=4, terms=NULL, max_term_size
   if(progress) message("Computing PCs.")
   pc <- pblapply(term_snps, function(snps) tryCatch({
     x <- as(geno[,snps], "numeric")
+    cv <- apply(x, 2, var)
+    x <- x[, cv > 1e-5]
     pc <- flashpca(x, npcs, stand, check_geno=FALSE, return_scale=FALSE, do_loadings=FALSE, ...)
     return(pc$vectors)
   }, error=function(e) return(NULL)))
@@ -80,6 +82,8 @@ compute_gene_pcs <- function(geno, genemap, npcs=4, stand="binom2", progress=int
   if(progress) message("Computing PCs.")
   pc <- pblapply(genes, function(snps) tryCatch({
     x <- as(geno[,snps], "numeric")
+    cv <- apply(x, 2, var)
+    x <- x[, cv > 1e-5]
     pc <- flashpca(x, npcs, stand, check_geno=FALSE, return_scale=FALSE, do_loadings=FALSE, ...)
     return(pc$vectors)
   }, error=function(e) return(NULL)))
