@@ -164,7 +164,7 @@ propagate_annotations.ontology <- function(o) {
   if(class(o) != "ontology") stop("o is not an ontology object.")
   if(is.null(o[["genes"]])) stop("Ontology is not annotated.")
 
-  edges <- data.frame(from=rep(o$id, lengths(o$children)), to=unlist(o$children), stringsAsFactors=FALSE)
+  edges <- data.frame(from=rep(o$id, lengths(o$children)), to=unlist(o$children), stringsAsFactors=FALSE, row.names=NULL)
   g <- graph_from_data_frame(edges, directed=TRUE)
   term_order <- rev(as_ids(topo_sort(g, "out")))
   term_i <- fmatch(term_order, o$id)
@@ -195,7 +195,7 @@ recompute_ancestors <- function(o) UseMethod("recompute_ancestors")
 recompute_ancestors.ontology <- function(o) {
   if(class(o) != "ontology") stop("o is not an ontology object.")
 
-  edges <- data.frame(from=rep(o$id, lengths(o$children)), to=unlist(o$children), stringsAsFactors=FALSE)
+  edges <- data.frame(from=rep(o$id, lengths(o$children)), to=unlist(o$children), stringsAsFactors=FALSE, row.names=NULL)
   g <- graph_from_data_frame(edges, directed=TRUE)
   term_order <- as_ids(topo_sort(g, "out"))
   term_i <- fmatch(term_order, o$id)
@@ -281,7 +281,7 @@ permute.ontology <- function(o, method="genes", recompute_ancestors=TRUE, bins=1
     return(annotate(o, anno))
   }
   else if(method == "sets") {
-    sizes <- data.frame(term=o$id, genes=lengths(o$genes), stringsAsFactors=FALSE, row.names=FALSE)
+    sizes <- data.frame(term=o$id, genes=lengths(o$genes), stringsAsFactors=FALSE, row.names=NULL)
     sizes <- sizes[order(sizes$genes),]
     sizes$bin <- floor(seq(1, bins+1-1/nrow(sizes), length.out=nrow(sizes)))
     term.bins <- split(sizes$term, sizes$bin)

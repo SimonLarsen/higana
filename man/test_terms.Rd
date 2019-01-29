@@ -5,7 +5,8 @@
 \title{Perform association test for terms.}
 \usage{
 test_terms(formula, covars, pc, o = NULL, npcs = Inf,
-  against = "none")
+  against = "none", family = binomial("logit"),
+  progress = interactive())
 }
 \arguments{
 \item{formula}{An object of class \code{formula}.}
@@ -19,6 +20,10 @@ test_terms(formula, covars, pc, o = NULL, npcs = Inf,
 \item{npcs}{Number of PCs to use. Set to \code{Inf} to use all available.}
 
 \item{against}{Model to test against for significance. One of "none", "parent".}
+
+\item{family}{Error distribution and link function to be used in the model. See \code{\link{glm.fit}} for details.}
+
+\item{progress}{Show progress bar?}
 }
 \value{
 A list with elements:

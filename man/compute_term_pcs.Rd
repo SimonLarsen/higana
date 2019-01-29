@@ -5,7 +5,8 @@
 \title{Compute principal components of SNPs annotated to ontology terms.}
 \usage{
 compute_term_pcs(o, geno, genemap, npcs = 4, terms = NULL,
-  max_term_size = Inf, stand = "binom2", ...)
+  max_term_size = Inf, stand = "binom2", progress = interactive(),
+  ...)
 }
 \arguments{
 \item{o}{An annotated \code{ontology} object.}
@@ -21,6 +22,8 @@ compute_term_pcs(o, geno, genemap, npcs = 4, terms = NULL,
 \item{max_term_size}{Skip terms annotated with more than this number of genes.}
 
 \item{stand}{Which standardization method to use. One of "none", "binom" (old Eigenstrat-style), "binom2" (new Eigenstrat-style), "sd" (zero-mean unit-variance) or "center" (zero mean).}
+
+\item{progress}{Show progress bar?}
 
 \item{...}{Further arguments to \code{\link{flashpcaR::flashpca}}.}
 }

@@ -4,7 +4,8 @@
 \alias{compute_gene_pcs}
 \title{Compute principal components of SNPs annotated to genes.}
 \usage{
-compute_gene_pcs(geno, genemap, npcs = 4, stand = "binom2", ...)
+compute_gene_pcs(geno, genemap, npcs = 4, stand = "binom2",
+  progress = interactive(), ...)
 }
 \arguments{
 \item{geno}{A \code{SnpMatrix} genotype matrix.}
@@ -14,6 +15,8 @@ compute_gene_pcs(geno, genemap, npcs = 4, stand = "binom2", ...)
 \item{npcs}{Number of principal components to compute per gene.}
 
 \item{stand}{Which standardization method to use. One of "none", "binom" (old Eigenstrat-style), "binom2" (new Eigenstrat-style), "sd" (zero-mean unit-variance) or "center" (zero mean).}
+
+\item{progress}{Show progress bar?}
 
 \item{...}{Further arguments to \code{\link{flashpcaR::flashpca}}.}
 }
