@@ -18,7 +18,7 @@ make_genemap(snps, ref = "hg19", maxgap = 10000, select = "all",
 
 \item{permute}{Permutation method.
 Use "none" for no permutation.
-"snps" randomly assigns SNPs to genes, preserving the frequency of each SNP.
+"snps" randomly assigns SNPs to genes, while preserving the frequency of each SNP and number of SNPs assigned to each gene.
 "genes" randomly shuffles gene locations among all genes.
 "genes.binned" shuffles gene locations within bins of similar gene size.}
 
