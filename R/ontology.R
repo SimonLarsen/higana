@@ -209,6 +209,30 @@ recompute_ancestors.ontology <- function(o) {
   return(o)
 }
 
+#' Collapse a set of terms, rerouting their children directly to their parents.
+#'
+#' @param o An \code{ontology} object.
+#' @param terms A character vectors of terms to collapse.
+#' @importFrom fastmatch fmatch
+#' @export
+collapse_terms <- function(o, terms) UseMethod("collapse_terms")
+
+#' @export
+collapse_terms.ontology <- function(o, terms) {
+  # Collapse terms
+  for(term in fmatch(terms, o$id)) {
+    for(parent in fmatch(o$parents[[term]], o$id)) {
+      o$children[[parent]] <- base::union(o$children[[parent]], o$children[[term]])
+    }
+    for(child in fmatch(o$children[[term]], o$id)) {
+      o$parents[[child]] <- base::union(o$parents[[child]], o$parents[[term]])
+    }
+  }
+
+  # Remove collapsed terms from ontology
+  filter.ontology(o, setdiff(o$id, terms), keep_connected=FALSE)
+}
+
 #' Collapse terms whose annotations are redundant with respect to their children.
 #'
 #' Collapses non-root and non-leaf terms in the ontology whose annotations are redundant
@@ -238,18 +262,8 @@ collapse_redundant_terms.ontology <- function(o) {
     any(sapply(o$genes[ch_i], function(g) setequal2(g, o$genes[[term]])))
   }) & lengths(o$children) > 0 & lengths(o$parents) > 0
 
-  # Collapse terms
-  for(term in which(redundant)) {
-    for(parent in fmatch(o$parents[[term]], o$id)) {
-      o$children[[parent]] <- base::union(o$children[[parent]], o$children[[term]])
-    }
-    for(child in fmatch(o$children[[term]], o$id)) {
-      o$parents[[child]] <- base::union(o$parents[[child]], o$parents[[term]])
-    }
-  }
-
-  # Remove collapsed terms from ontology
-  filter.ontology(o, o$id[!redundant], keep_connected=FALSE)
+  # collapse
+  collapse_terms.ontology(o, o$id[redundant])
 }
 
 #' Permute an ontology.
