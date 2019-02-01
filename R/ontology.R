@@ -233,11 +233,10 @@ collapse_redundant_terms.ontology <- function(o) {
   setequal2 <- function(x, y) {
     length(x) == length(y) && !anyNA(fmatch(x, y)) && !anyNA(fmatch(x, y))
   }
-  terms_i <- which(lengths(o$children) > 0 & lengths(o$parents) > 0)
-  redundant <- sapply(terms_i, function(term) {
+  redundant <- sapply(seq_along(o$id), function(term) {
     ch_i <- fmatch(o$children[[term]], o$id)
     any(sapply(o$genes[ch_i], function(g) setequal2(g, o$genes[[term]])))
-  })
+  }) & lengths(o$children) > 0 & lengths(o$parents) > 0
 
   # Collapse terms
   for(term in which(redundant)) {
