@@ -3,9 +3,8 @@
 #' @param formula An object of class \code{formula}.
 #' @param covars A data frame containing covariates.
 #' @param pc Named list of PCs from terms. Computed with \code{\link{compute_term_pcs}}.
-#' @param o An \code{ontology} object.
 #' @param family Error distribution and link function to be used in the model. See \code{\link{glm.fit}} for details.
-#' @param progress Show progress bar?
+#' @param num_threads Number of threads.
 #' @return A list with elements:
 #'   \describe{
 #'     \item{\code{reference}}{Reference model.}
@@ -53,7 +52,7 @@ test_terms <- function(formula, covars, pc, family=binomial("logit"), num_thread
 #' @param covars A data frame containing covariates.
 #' @param pc Named list of PCs from genes. Computed with \code{\link{compute_gene_pcs}}.
 #' @param family Error distribution and link function to be used in the model. See \code{\link{glm.fit}} for details.
-#' @param progress Show progress bar?
+#' @param num_threads Number of threads.
 #' @return A list with elements:
 #'   \describe{
 #'     \item{\code{reference}}{Reference model.}
