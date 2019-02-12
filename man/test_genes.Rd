@@ -20,8 +20,12 @@ test_genes(formula, covars, pc, family = binomial("logit"),
 }
 \value{
 A list with elements:
-  \item{\code{test}}{Test objects for each gene.}
-  \item{\code{pvalue}}{p-values for each gene.}
+  \describe{
+    \item{\code{reference}}{Reference model.}
+    \item{\code{coef}}{Coefficients from each gene model.}
+    \item{\code{tests}}{Test objects for each gene}
+    \item{\code{pvalue}}{p-values for each gene}
+  }
 }
 \description{
 Perform association test for genes.

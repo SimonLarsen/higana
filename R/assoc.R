@@ -8,7 +8,9 @@
 #' @param progress Show progress bar?
 #' @return A list with elements:
 #'   \describe{
-#'     \item{\code{test}}{Test objects for each term.}
+#'     \item{\code{reference}}{Reference model.}
+#'     \item{\code{coef}}{Coefficients from each term model.}
+#'     \item{\code{tests}}{Test objects for each term.}
 #'     \item{\code{pvalue}}{p-values for each term.}
 #'   }
 #' @importFrom pbapply pblapply
@@ -53,8 +55,12 @@ test_terms <- function(formula, covars, pc, family=binomial("logit"), num_thread
 #' @param family Error distribution and link function to be used in the model. See \code{\link{glm.fit}} for details.
 #' @param progress Show progress bar?
 #' @return A list with elements:
-#'   \item{\code{test}}{Test objects for each gene.}
-#'   \item{\code{pvalue}}{p-values for each gene.}
+#'   \describe{
+#'     \item{\code{reference}}{Reference model.}
+#'     \item{\code{coef}}{Coefficients from each gene model.}
+#'     \item{\code{tests}}{Test objects for each gene}
+#'     \item{\code{pvalue}}{p-values for each gene}
+#'   }
 #' @export
 test_genes <- function(formula, covars, pc, family=binomial("logit"), num_threads=1) {
   test_terms(formula, covars, pc, family=family, num_threads)

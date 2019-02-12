@@ -23,7 +23,9 @@ test_terms(formula, covars, pc, family = binomial("logit"),
 \value{
 A list with elements:
   \describe{
-    \item{\code{test}}{Test objects for each term.}
+    \item{\code{reference}}{Reference model.}
+    \item{\code{coef}}{Coefficients from each term model.}
+    \item{\code{tests}}{Test objects for each term.}
     \item{\code{pvalue}}{p-values for each term.}
   }
 }
