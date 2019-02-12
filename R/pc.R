@@ -3,22 +3,22 @@
 #' @param o An annotated \code{ontology} object.
 #' @param geno A \code{SnpMatrix} genotype matrix.
 #' @param genemap A data frame mapping genes to SNP rs numbers.
-#' @param npcs Number of principal components to compute per term.
 #' @param terms A character vector of terms to compute PCs for. Will use all terms if not provided.
 #' @param max_term_size Skip terms annotated with more than this number of genes.
+#' @param max_term_size Skip terms annotated with fewer than this number of genes.
 #' @param stand Which standardization method to use. One of "none", "binom" (old Eigenstrat-style), "binom2" (new Eigenstrat-style), "sd" (zero-mean unit-variance) or "center" (zero mean).
 #' @param progress Show progress bar?
-#' @param ... Further arguments to \code{\link{flashpcaR::flashpca}}.
 #' @importFrom fastmatch "%fin%"
-#' @importFrom flashpcaR flashpca
-#' @importFrom pbapply pboptions
 #' @importFrom pbapply pblapply
-#' @return A list of matrices where each column corresponds to a PC.
+#' @importFrom pbmcapply pbmclapply
+#' @return A list of singular value decompositions for each term. Each entry is a list with elements
+#'   \describe{
+#'     \item{\code{u}}{The left-singular vectors.}
+#'     \item{\code{d}}{The non-zero singular values.}
+#'     \item{\code{v}}{The right-singular vectors.}
+#'   }
 #' @export
-compute_term_pcs <- function(o, geno, genemap, npcs=4, terms=NULL, max_term_size=Inf, stand="binom2", progress=interactive(), ...) {
-  pbo <- pboptions(type = if(progress) "timer" else "none")
-  on.exit(pboptions(pbo), add=TRUE)
-
+compute_term_pcs <- function(o, geno, genemap, stand="binom2", terms=NULL, max_term_size=Inf, min_term_size=2, explain_var=1, max_pcs=Inf, num_threads=1) {
   if(class(o) != "ontology") {
     stop("o is not an ontology object.")
   }
@@ -34,6 +34,8 @@ compute_term_pcs <- function(o, geno, genemap, npcs=4, terms=NULL, max_term_size
 
   # restrict to terms below max_term_size
   terms <- intersect(terms, o$id[lengths(o$genes) <= max_term_size])
+  # restrict to terms above min_term_size
+  terms <- intersect(terms, o$id[lengths(o$genes) >= min_term_size])
 
   if(progress) message("Extracting gene SNPs.")
   term_snps <- pblapply(setNames(terms, terms), function(term) {
@@ -42,13 +44,13 @@ compute_term_pcs <- function(o, geno, genemap, npcs=4, terms=NULL, max_term_size
   term_snps <- term_snps[lengths(term_snps) > 0]
 
   if(progress) message("Computing PCs.")
-  pc <- pblapply(term_snps, function(snps) tryCatch({
+  pc <- pbmclapply(term_snps, function(snps) tryCatch({
     x <- as(geno[,snps], "numeric")
-    cv <- apply(x, 2, var)
-    x <- x[, cv > 1e-5]
-    pc <- flashpca(x, npcs, stand, check_geno=FALSE, return_scale=FALSE, do_loadings=FALSE, ...)
-    return(pc$vectors)
-  }, error=function(e) return(NULL)))
+    cv <- apply(x, 2, var, na.rm=TRUE)
+    x <- x[, cv > 1e-5, drop=FALSE]
+    if(stand != "none") x <- scale2(x, stand)
+    get_svd(x, explain_var, max_pcs)
+  }, error=function(e) return(NULL)), mc.cores=num_threads)
 
   pc[!sapply(pc, is.null)]
 }
@@ -60,16 +62,15 @@ compute_term_pcs <- function(o, geno, genemap, npcs=4, terms=NULL, max_term_size
 #' @param npcs Number of principal components to compute per gene.
 #' @param stand Which standardization method to use. One of "none", "binom" (old Eigenstrat-style), "binom2" (new Eigenstrat-style), "sd" (zero-mean unit-variance) or "center" (zero mean).
 #' @param progress Show progress bar?
-#' @param ... Further arguments to \code{\link{flashpcaR::flashpca}}.
-#' @return A list of matrices where each column corresponds to a PC.
-#' @importFrom flashpcaR flashpca
-#' @importFrom pbapply pboptions
+#' @return A list of singular value decompositions for each gene Each entry is a list with elements
+#'   \describe{
+#'     \item{\code{u}}{The left-singular vectors.}
+#'     \item{\code{d}}{The non-zero singular values.}
+#'     \item{\code{v}}{The right-singular vectors.}
+#'   }
 #' @importFrom pbapply pblapply
 #' @export
-compute_gene_pcs <- function(geno, genemap, npcs=4, stand="binom2", progress=interactive(), ...) {
-  pbo <- pboptions(type = if(progress) "timer" else "none")
-  on.exit(pboptions(pbo), add=TRUE)
-
+compute_gene_pcs <- function(geno, genemap, npcs=4, stand="binom2") {
   if(!("data.frame" %in% class(genemap))) {
     stop("genemap is not a data frame.")
   }
@@ -83,10 +84,27 @@ compute_gene_pcs <- function(geno, genemap, npcs=4, stand="binom2", progress=int
   pc <- pblapply(genes, function(snps) tryCatch({
     x <- as(geno[,snps], "numeric")
     cv <- apply(x, 2, var)
-    x <- x[, cv > 1e-5]
-    pc <- flashpca(x, npcs, stand, check_geno=FALSE, return_scale=FALSE, do_loadings=FALSE, ...)
-    return(pc$vectors)
+    x <- x[, cv > 1e-5, drop=FALSE]
+    if(stand != "none") x <- scale2(x, stand)
+    get_svd(x, explain_var, max_pcs)
   }, error=function(e) return(NULL)))
 
   pc[!sapply(pc, is.null)]
+}
+
+#' @importFrom corpcor fast.svd
+get_svd <- function(x, explain_var, max_pcs) {
+  sv <- fast.svd(x)
+
+  rownames(sv$v) <- colnames(x)
+
+  eig <- sv$d^2
+  ex <- cumsum(eig) / sum(eig)
+  numpc <- sum(ex < explain_var)+1
+  numpc <- min(numpc, max_pcs, length(sv$d))
+
+  sv$d <- head(sv$d, numpc)
+  sv$u <- sv$u[, seq_len(numpc), drop=FALSE]
+  sv$v <- sv$v[, seq_len(numpc), drop=FALSE]
+  sv
 }

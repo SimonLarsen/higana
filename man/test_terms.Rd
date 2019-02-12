@@ -4,9 +4,8 @@
 \alias{test_terms}
 \title{Perform association test for terms.}
 \usage{
-test_terms(formula, covars, pc, o = NULL, npcs = Inf,
-  against = "none", family = binomial("logit"),
-  progress = interactive())
+test_terms(formula, covars, pc, family = binomial("logit"),
+  num_threads = 1)
 }
 \arguments{
 \item{formula}{An object of class \code{formula}.}
@@ -15,20 +14,18 @@ test_terms(formula, covars, pc, o = NULL, npcs = Inf,
 
 \item{pc}{Named list of PCs from terms. Computed with \code{\link{compute_term_pcs}}.}
 
-\item{o}{An \code{ontology} object.}
-
-\item{npcs}{Number of PCs to use. Set to \code{Inf} to use all available.}
-
-\item{against}{Model to test against for significance. One of "none", "parent".}
-
 \item{family}{Error distribution and link function to be used in the model. See \code{\link{glm.fit}} for details.}
+
+\item{o}{An \code{ontology} object.}
 
 \item{progress}{Show progress bar?}
 }
 \value{
 A list with elements:
-  \item{\code{test}}{Test objects for each term.}
-  \item{\code{pvalue}}{p-values for each term.}
+  \describe{
+    \item{\code{test}}{Test objects for each term.}
+    \item{\code{pvalue}}{p-values for each term.}
+  }
 }
 \description{
 Perform association test for terms.

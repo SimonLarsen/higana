@@ -4,8 +4,8 @@
 \alias{test_genes}
 \title{Perform association test for genes.}
 \usage{
-test_genes(formula, covars, pc, npcs = Inf, family = binomial("logit"),
-  progress = interactive())
+test_genes(formula, covars, pc, family = binomial("logit"),
+  num_threads = 1)
 }
 \arguments{
 \item{formula}{An object of class \code{formula}.}
@@ -13,8 +13,6 @@ test_genes(formula, covars, pc, npcs = Inf, family = binomial("logit"),
 \item{covars}{A data frame containing covariates.}
 
 \item{pc}{Named list of PCs from genes. Computed with \code{\link{compute_gene_pcs}}.}
-
-\item{npcs}{Number of PCs to use. Set to \code{Inf} to use all available.}
 
 \item{family}{Error distribution and link function to be used in the model. See \code{\link{glm.fit}} for details.}
 

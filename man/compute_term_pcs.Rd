@@ -4,9 +4,9 @@
 \alias{compute_term_pcs}
 \title{Compute principal components of SNPs annotated to ontology terms.}
 \usage{
-compute_term_pcs(o, geno, genemap, npcs = 4, terms = NULL,
-  max_term_size = Inf, stand = "binom2", progress = interactive(),
-  ...)
+compute_term_pcs(o, geno, genemap, stand = "binom2", terms = NULL,
+  max_term_size = Inf, min_term_size = 2, explain_var = 1,
+  max_pcs = Inf, num_threads = 1)
 }
 \arguments{
 \item{o}{An annotated \code{ontology} object.}
@@ -15,20 +15,23 @@ compute_term_pcs(o, geno, genemap, npcs = 4, terms = NULL,
 
 \item{genemap}{A data frame mapping genes to SNP rs numbers.}
 
-\item{npcs}{Number of principal components to compute per term.}
+\item{stand}{Which standardization method to use. One of "none", "binom" (old Eigenstrat-style), "binom2" (new Eigenstrat-style), "sd" (zero-mean unit-variance) or "center" (zero mean).}
 
 \item{terms}{A character vector of terms to compute PCs for. Will use all terms if not provided.}
 
 \item{max_term_size}{Skip terms annotated with more than this number of genes.}
 
-\item{stand}{Which standardization method to use. One of "none", "binom" (old Eigenstrat-style), "binom2" (new Eigenstrat-style), "sd" (zero-mean unit-variance) or "center" (zero mean).}
+\item{max_term_size}{Skip terms annotated with fewer than this number of genes.}
 
 \item{progress}{Show progress bar?}
-
-\item{...}{Further arguments to \code{\link{flashpcaR::flashpca}}.}
 }
 \value{
-A list of matrices where each column corresponds to a PC.
+A list of singular value decompositions for each term. Each entry is a list with elements
+  \describe{
+    \item{\code{u}}{The left-singular vectors.}
+    \item{\code{d}}{The non-zero singular values.}
+    \item{\code{v}}{The right-singular vectors.}
+  }
 }
 \description{
 Compute principal components of SNPs annotated to ontology terms.

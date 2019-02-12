@@ -14,11 +14,12 @@ RoxygenNote: 6.1.1
 Imports:
     ontologyIndex,
     ontologyPlot,
+    corpcor,
+    GenomicRanges,
+    igraph,
     circlize,
     fastmatch,
-    GenomicRanges,
-    flashpcaR,
-    igraph,
-    pbapply
+    pbapply,
+    pbmcapply
 Suggests:
     snpStats
