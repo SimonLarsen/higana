@@ -21,9 +21,13 @@ compute_term_pcs(o, geno, genemap, stand = "binom2", terms = NULL,
 
 \item{max_term_size}{Skip terms annotated with more than this number of genes.}
 
-\item{max_term_size}{Skip terms annotated with fewer than this number of genes.}
+\item{explain_var}{Restrict number of PCs to explain at least this fraction of variance.}
 
-\item{progress}{Show progress bar?}
+\item{max_pcs}{Return at most this number of PCs.}
+
+\item{num_threads}{Number of threads.}
+
+\item{max_term_size}{Skip terms annotated with fewer than this number of genes.}
 }
 \value{
 A list of singular value decompositions for each term. Each entry is a list with elements

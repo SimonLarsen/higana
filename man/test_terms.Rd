@@ -16,9 +16,7 @@ test_terms(formula, covars, pc, family = binomial("logit"),
 
 \item{family}{Error distribution and link function to be used in the model. See \code{\link{glm.fit}} for details.}
 
-\item{o}{An \code{ontology} object.}
-
-\item{progress}{Show progress bar?}
+\item{num_threads}{Number of threads.}
 }
 \value{
 A list with elements:

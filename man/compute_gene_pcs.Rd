@@ -4,18 +4,21 @@
 \alias{compute_gene_pcs}
 \title{Compute principal components of SNPs annotated to genes.}
 \usage{
-compute_gene_pcs(geno, genemap, npcs = 4, stand = "binom2")
+compute_gene_pcs(geno, genemap, stand = "binom2", explain_var = 1,
+  max_pcs = Inf, num_threads = 1)
 }
 \arguments{
 \item{geno}{A \code{SnpMatrix} genotype matrix.}
 
 \item{genemap}{A data frame mapping genes to SNP rs numbers.}
 
-\item{npcs}{Number of principal components to compute per gene.}
-
 \item{stand}{Which standardization method to use. One of "none", "binom" (old Eigenstrat-style), "binom2" (new Eigenstrat-style), "sd" (zero-mean unit-variance) or "center" (zero mean).}
 
-\item{progress}{Show progress bar?}
+\item{explain_var}{Restrict number of PCs to explain at least this fraction of variance.}
+
+\item{max_pcs}{Return at most this number of PCs.}
+
+\item{num_threads}{Number of threads.}
 }
 \value{
 A list of singular value decompositions for each gene Each entry is a list with elements
