@@ -84,13 +84,13 @@ compute_gene_pcs <- function(geno, genemap, stand="binom2", explain_var=1, max_p
   genes <- split(genemap$snp, genemap$gene)
 
   if(interactive()) message("Computing PCs.")
-  pc <- pbmclapply(setNames(genes, genes), function(snps) tryCatch({
+  pc <- pbmclapply(genes, function(snps) tryCatch({
     x <- as(geno[,snps], "numeric")
-    cv <- apply(x, 2, var)
+    cv <- apply(x, 2, var, na.rm=TRUE)
     x <- x[, cv > 1e-5, drop=FALSE]
     if(stand != "none") x <- scale2(x, stand)
     get_svd(x, explain_var, max_pcs)
-  }, error=function(e) return(NULL)))
+  }, error=function(e) return(NULL)), mc.cores=num_threads)
 
   pc[!sapply(pc, is.null)]
 }
