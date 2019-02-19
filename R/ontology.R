@@ -240,30 +240,56 @@ collapse_terms.ontology <- function(o, terms) {
 #' of the union of annotations of its children.
 #'
 #' @param o An annotated \code{ontology} object.
+#' @param threshold Filter terms with redundancy (maximum Jaccard index) above this threshold.
 #' @return A filtered \code{ontology} object.
 #' @importFrom fastmatch fmatch
 #' @export
-collapse_redundant_terms <- function(o) UseMethod("collapse_redundant_terms")
+collapse_redundant_terms <- function(o, threshold=1) UseMethod("collapse_redundant_terms")
 
 #' @export
-collapse_redundant_terms.ontology <- function(o) {
+collapse_redundant_terms.ontology <- function(o, threshold=1) {
   if(class(o) != "ontology") stop("o is not an ontology object.")
   if(is.null(o[["genes"]])) stop("Ontology is not annotated.")
 
   # Remove unannotated terms
   o <- filter.ontology(o, o$id[lengths(o$genes) > 0], keep_connected=FALSE)
 
-  # Identify redundant terms
-  setequal2 <- function(x, y) {
-    length(x) == length(y) && !anyNA(fmatch(x, y)) && !anyNA(fmatch(x, y))
-  }
-  redundant <- sapply(seq_along(o$id), function(term) {
-    ch_i <- fmatch(o$children[[term]], o$id)
-    any(sapply(o$genes[ch_i], function(g) setequal2(g, o$genes[[term]])))
-  }) & lengths(o$children) > 0 & lengths(o$parents) > 0
+  # Compute redundancy scores
+  redundancy <- compute_redundancy(o)
+  redundant <- redundancy >= threshold & lengths(o$parents) > 0
 
   # collapse
   collapse_terms.ontology(o, o$id[redundant])
+}
+
+#' Compute redundancy score for each term.
+#'
+#' The score is defined as the maximum Jaccard index between the annotations of a term and the annotations of its children.
+#' @param o An annotated \code{ontology} object.
+#' @return A numeric vector of Jaccard index values (between 0 and 1) for each term.
+#'     Terms for which the score is not defined (e.g. terms with no children or no annotations) will have an \code{NA} value.
+#' @export
+compute_redundancy <- function(o) UseMethod("compute_redundancy")
+
+#' @importFrom fastmatch fmatch
+#' @export
+compute_redundancy.ontology <- function(o) {
+  if(class(o) != "ontology") stop("o is not an ontology object.")
+  if(is.null(o[["genes"]])) stop("Ontology is not annotated.")
+
+  jaccard <- function(x, y) {
+    length(unique(y[fmatch(x, y, 0L)])) / length(union(x, y))
+  }
+
+  terms <- o$id[lengths(o$children) > 0 & lengths(o$genes) > 0]
+  terms_i <- setNames(fmatch(terms, o$id), terms)
+
+  out <- setNames(rep(NA, length(o$id)), o$id)
+  out[terms_i] <- sapply(terms_i, function(term) {
+    ch_i <- fmatch(o$children[[term]], o$id)
+    max(0, sapply(o$genes[ch_i], function(g) jaccard(g, o$genes[[term]])), na.rm=TRUE)
+  })
+  out
 }
 
 #' Permute an ontology.
