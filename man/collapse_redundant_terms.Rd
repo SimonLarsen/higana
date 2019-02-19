@@ -4,10 +4,12 @@
 \alias{collapse_redundant_terms}
 \title{Collapse terms whose annotations are redundant with respect to their children.}
 \usage{
-collapse_redundant_terms(o)
+collapse_redundant_terms(o, threshold = 1)
 }
 \arguments{
 \item{o}{An annotated \code{ontology} object.}
+
+\item{threshold}{Filter terms with redundancy (maximum Jaccard index) above this threshold.}
 }
 \value{
 A filtered \code{ontology} object.
