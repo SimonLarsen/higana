@@ -45,7 +45,7 @@ snps <- read.plink("geno.bed", "geno.bim", "geno.fam")
 
 genemap <- make_genemap(snps$map, "hg19", maxgap=10e3)
 
-pc <- compute_term_pcs(go, snps$genotypes, genemap, npcs=4, explain_var=0.5, max_pcs=25)
+pc <- compute_term_pcs(go, snps$genotypes, genemap, explain_var=0.5, max_pcs=25)
 
 saveRDS(pc, "term_pcs.rds") # warning: large file
 ```
