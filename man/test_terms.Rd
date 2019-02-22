@@ -5,7 +5,7 @@
 \title{Perform association test for terms.}
 \usage{
 test_terms(formula, covars, pc, family = binomial("logit"),
-  num_threads = 1)
+  max_pcs = Inf, num_threads = 1)
 }
 \arguments{
 \item{formula}{An object of class \code{formula}.}
@@ -15,6 +15,8 @@ test_terms(formula, covars, pc, family = binomial("logit"),
 \item{pc}{Named list of PCs from terms. Computed with \code{\link{compute_term_pcs}}.}
 
 \item{family}{Error distribution and link function to be used in the model. See \code{\link{glm.fit}} for details.}
+
+\item{max_pcs}{Maximum number of PCs to use per term.}
 
 \item{num_threads}{Number of threads.}
 }
