@@ -5,7 +5,7 @@
 \title{Compute principal components of SNPs annotated to genes.}
 \usage{
 compute_gene_pcs(geno, genemap, stand = "binom2", explain_var = 1,
-  max_pcs = Inf, num_threads = 1)
+  max_pcs = Inf, num_threads = 1, rsvd_threshold = 0)
 }
 \arguments{
 \item{geno}{A \code{SnpMatrix} genotype matrix.}
@@ -19,6 +19,8 @@ compute_gene_pcs(geno, genemap, stand = "binom2", explain_var = 1,
 \item{max_pcs}{Return at most this number of PCs.}
 
 \item{num_threads}{Number of threads.}
+
+\item{rsvd_threshold}{Use randomized SVD when number of variables exceeds this threshold.}
 }
 \value{
 A list of singular value decompositions for each gene Each entry is a list with elements

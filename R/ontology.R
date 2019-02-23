@@ -39,7 +39,7 @@ read_gaf <- function(path, aspects, exclude_evidence) {
 #' @importFrom fastmatch "%fin%"
 #' @importFrom ontologyIndex get_ancestors
 #' @export
-filter <- function(o, terms, keep_connected=FALSE) UseMethod("filter")
+filter <- function(o, terms, keep_connected=TRUE) UseMethod("filter")
 
 #' @export
 filter.ontology <- function(o, terms, keep_connected=TRUE) {

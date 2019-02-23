@@ -4,7 +4,7 @@
 \alias{filter}
 \title{Filter ontology to a specific set of terms.}
 \usage{
-filter(o, terms, keep_connected = FALSE)
+filter(o, terms, keep_connected = TRUE)
 }
 \arguments{
 \item{o}{An \code{ontology} object.}

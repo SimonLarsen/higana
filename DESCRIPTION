@@ -15,6 +15,7 @@ Imports:
     ontologyIndex,
     ontologyPlot,
     corpcor,
+    Matrix,
     GenomicRanges,
     igraph,
     circlize,

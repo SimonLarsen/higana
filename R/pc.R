@@ -10,6 +10,7 @@
 #' @param explain_var Restrict number of PCs to explain at least this fraction of variance.
 #' @param max_pcs Return at most this number of PCs.
 #' @param num_threads Number of threads.
+#' @param rsvd_threshold Use randomized SVD when number of variables exceeds this threshold.
 #' @importFrom fastmatch "%fin%"
 #' @importFrom pbapply pblapply
 #' @importFrom pbmcapply pbmclapply
@@ -20,7 +21,7 @@
 #'     \item{\code{v}}{The right-singular vectors.}
 #'   }
 #' @export
-compute_term_pcs <- function(o, geno, genemap, stand="binom2", terms=NULL, max_term_size=Inf, min_term_size=2, explain_var=1, max_pcs=Inf, num_threads=1) {
+compute_term_pcs <- function(o, geno, genemap, stand="binom2", terms=NULL, max_term_size=Inf, min_term_size=2, explain_var=1, max_pcs=Inf, num_threads=1, rsvd_threshold=0) {
   if(class(o) != "ontology") {
     stop("o is not an ontology object.")
   }
@@ -51,7 +52,11 @@ compute_term_pcs <- function(o, geno, genemap, stand="binom2", terms=NULL, max_t
     cv <- apply(x, 2, var, na.rm=TRUE)
     x <- x[, cv > 1e-5, drop=FALSE]
     if(stand != "none") x <- scale2(x, stand)
-    get_svd(x, explain_var, max_pcs)
+    if(ncol(x) <= rsvd_threshold) {
+      get_svd(x, explain_var, max_pcs)
+    } else {
+      get_rsvd(x, explain_var, max_pcs)
+    }
   }, error=function(e) return(NULL)), mc.cores=num_threads)
 
   pc[!sapply(pc, is.null)]
@@ -65,6 +70,7 @@ compute_term_pcs <- function(o, geno, genemap, stand="binom2", terms=NULL, max_t
 #' @param explain_var Restrict number of PCs to explain at least this fraction of variance.
 #' @param max_pcs Return at most this number of PCs.
 #' @param num_threads Number of threads.
+#' @param rsvd_threshold Use randomized SVD when number of variables exceeds this threshold.
 #' @return A list of singular value decompositions for each gene Each entry is a list with elements
 #'   \describe{
 #'     \item{\code{u}}{The left-singular vectors.}
@@ -73,7 +79,7 @@ compute_term_pcs <- function(o, geno, genemap, stand="binom2", terms=NULL, max_t
 #'   }
 #' @importFrom pbmcapply pbmclapply
 #' @export
-compute_gene_pcs <- function(geno, genemap, stand="binom2", explain_var=1, max_pcs=Inf, num_threads=1) {
+compute_gene_pcs <- function(geno, genemap, stand="binom2", explain_var=1, max_pcs=Inf, num_threads=1, rsvd_threshold=0) {
   if(!("data.frame" %in% class(genemap))) {
     stop("genemap is not a data frame.")
   }
@@ -89,7 +95,11 @@ compute_gene_pcs <- function(geno, genemap, stand="binom2", explain_var=1, max_p
     cv <- apply(x, 2, var, na.rm=TRUE)
     x <- x[, cv > 1e-5, drop=FALSE]
     if(stand != "none") x <- scale2(x, stand)
-    get_svd(x, explain_var, max_pcs)
+    if(ncol(x) <= rsvd_threshold) {
+      get_svd(x, explain_var, max_pcs)
+    } else {
+      get_rsvd(x, explain_var, max_pcs)
+    }
   }, error=function(e) return(NULL)), mc.cores=num_threads)
 
   pc[!sapply(pc, is.null)]
@@ -99,6 +109,23 @@ compute_gene_pcs <- function(geno, genemap, stand="binom2", explain_var=1, max_p
 get_svd <- function(x, explain_var, max_pcs) {
   sv <- fast.svd(x)
 
+  rownames(sv$v) <- colnames(x)
+
+  eig <- sv$d^2
+  ex <- cumsum(eig) / sum(eig)
+  numpc <- sum(ex < explain_var)+1
+  numpc <- min(numpc, max_pcs, length(sv$d))
+
+  sv$d <- head(sv$d, numpc)
+  sv$u <- sv$u[, seq_len(numpc), drop=FALSE]
+  sv$v <- sv$v[, seq_len(numpc), drop=FALSE]
+  sv
+}
+
+get_rsvd <- function(x, explain_var, max_pcs) {
+  sv <- rsvd(x, max_pcs)
+
+  rownames(sv$u) <- rownames(x)
   rownames(sv$v) <- colnames(x)
 
   eig <- sv$d^2
