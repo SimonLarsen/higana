@@ -7,17 +7,15 @@
 #' @param Test statistic for model comparison. One of "Chisq", "LRT", "Rao", "F" or "Cp". See \code{\link{stat.anova}}.
 #' @param terms Character vector of terms to test. Defaults to all terms.
 #' @param max_pcs Maximum number of PCs to use per term.
-#' @param num_threads Number of threads.
 #' @return A list with elements:
 #'   \describe{
 #'     \item{\code{test}}{Test objects for each term.}
 #'     \item{\code{coef}}{Coefficients from each term model.}
 #'   }
-#' @importFrom pbapply pblapply
-#' @importFrom pbmcapply pbmclapply
+#' @importFrom future.apply future_lapply
 #' @importFrom fastmatch "%fin%"
 #' @export
-test_terms <- function(formula, covars, pc, family=binomial("logit"), test=NULL, terms=NULL, max_pcs=Inf, num_threads=1) {
+test_terms <- function(formula, covars, pc, family=binomial("logit"), test=NULL, terms=NULL, max_pcs=Inf) {
   if(class(formula) != "formula") stop("formula is not a formula.")
   if(!("data.frame" %in% class(covars))) stop("covars is not a data frame.")
   if(any(grepl("TERM[0-9]+", colnames(covars)))) stop("Covariates named \"TERM[n]\" where [n] is a number are not allowed.")
@@ -32,7 +30,7 @@ test_terms <- function(formula, covars, pc, family=binomial("logit"), test=NULL,
 
   reference.model <- glm(formula, covars, family=family, na.action=na.omit)
 
-  out <- pbmclapply(pc[terms], function(term) {
+  out <- future_lapply(pc[terms], function(term) {
     if(length(term$d > 1)) x <- term$u %*% diag(term$d)
     else x <- term$u * term$d
 
@@ -46,7 +44,7 @@ test_terms <- function(formula, covars, pc, family=binomial("logit"), test=NULL,
     t <- anova(reference.model, fit, test="LRT")
 
     list(test=t, coef=coefficients(summary(fit)))
-  }, mc.cores=num_threads)
+  })
 
   list(
     coef=lapply(out, `[[`, "coef"),
@@ -64,16 +62,15 @@ test_terms <- function(formula, covars, pc, family=binomial("logit"), test=NULL,
 #' @param Test statistic for model comparison. One of "Chisq", "LRT", "Rao", "F" or "Cp". See \code{\link{stat.anova}}.
 #' @param terms Character vector of terms to test. Defaults to all terms.
 #' @param max_pcs Maximum number of PCs to use per term.
-#' @param num_threads Number of threads.
 #' @return A list with elements:
 #'   \describe{
 #'     \item{\code{test}}{Test objects for each term.}
 #'     \item{\code{coef}}{Coefficients from each term model.}
 #'   }
 #' @importFrom fastmatch "%fin%"
-#' @importFrom pbmcapply pbmclapply
+#' @importFrom future.apply future_lapply
 #' @export
-test_terms_children <- function(formula, covars, pc, o, family=binomial("logit"), test=NULL, terms=NULL, max_pcs=Inf, num_threads=1) {
+test_terms_children <- function(formula, covars, pc, o, family=binomial("logit"), test=NULL, terms=NULL, max_pcs=Inf) {
   if(class(formula) != "formula") stop("formula is not a formula.")
   if(!("data.frame" %in% class(covars))) stop("covars is not a data frame.")
   if(any(grepl("TERM[0-9]+", colnames(covars)))) stop("Covariates named \"TERM[n]\" where [n] is a number are not allowed.")
@@ -88,8 +85,7 @@ test_terms_children <- function(formula, covars, pc, o, family=binomial("logit")
   if(is.null(terms)) terms <- names(pc)
   terms <- intersect(terms, go$id[lengths(go$children) > 0])
 
-  out <- pbmclapply(terms, function(term) {
-    message(term)
+  out <- future_lapply(terms, function(term) {
     x.term <- pc[[term]]$u
     if(ncol(x.term) > max_pcs) x.term <- x.term[,seq_len(max_pcs), drop=FALSE]
     colnames(x.term) <- paste0("TERM", seq_len(ncol(x.term)))
@@ -119,7 +115,7 @@ test_terms_children <- function(formula, covars, pc, o, family=binomial("logit")
     t <- anova(fit, fit2, test="LRT")
 
     list(test=t, coef=coefficients(summary(fit2)))
-  }, mc.cores=num_threads)
+  })
   names(out) <- paste0(tests$term, ".", tests$child)
 
   list(
@@ -136,7 +132,6 @@ test_terms_children <- function(formula, covars, pc, o, family=binomial("logit")
 #' @param family Error distribution and link function to be used in the model. See \code{\link{glm.fit}} for details.
 #' @param Test statistic for model comparison. One of "Chisq", "LRT", "Rao", "F" or "Cp". See \code{\link{stat.anova}}.
 #' @param max_pcs Maximum number of PCs to use per gene.
-#' @param num_threads Number of threads.
 #' @return A list with elements:
 #'   \describe{
 #'     \item{\code{reference}}{Reference model.}
@@ -145,6 +140,6 @@ test_terms_children <- function(formula, covars, pc, o, family=binomial("logit")
 #'     \item{\code{pvalue}}{p-values for each gene}
 #'   }
 #' @export
-test_genes <- function(formula, covars, pc, family=binomial("logit"), test=NULL, max_pcs=Inf, num_threads=1) {
-  test_terms(formula, covars, pc, family=family, max_pcs=max_pcs, num_threads=num_threads)
+test_genes <- function(formula, covars, pc, family=binomial("logit"), test=NULL, max_pcs=Inf) {
+  test_terms(formula, covars, pc, family=family, max_pcs=max_pcs)
 }

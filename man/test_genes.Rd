@@ -5,7 +5,7 @@
 \title{Perform association test for genes.}
 \usage{
 test_genes(formula, covars, pc, family = binomial("logit"),
-  test = NULL, max_pcs = Inf, num_threads = 1)
+  test = NULL, max_pcs = Inf)
 }
 \arguments{
 \item{formula}{An object of class \code{formula}.}
@@ -17,8 +17,6 @@ test_genes(formula, covars, pc, family = binomial("logit"),
 \item{family}{Error distribution and link function to be used in the model. See \code{\link{glm.fit}} for details.}
 
 \item{max_pcs}{Maximum number of PCs to use per gene.}
-
-\item{num_threads}{Number of threads.}
 
 \item{Test}{statistic for model comparison. One of "Chisq", "LRT", "Rao", "F" or "Cp". See \code{\link{stat.anova}}.}
 }

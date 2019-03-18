@@ -6,7 +6,7 @@
 \usage{
 compute_term_pcs(o, geno, genemap, stand = "binom2", terms = NULL,
   max_term_size = Inf, min_term_size = 2, explain_var = 1,
-  max_pcs = Inf, num_threads = 1, rsvd_threshold = 0)
+  max_pcs = Inf, rsvd_threshold = 0)
 }
 \arguments{
 \item{o}{An annotated \code{ontology} object.}
@@ -24,8 +24,6 @@ compute_term_pcs(o, geno, genemap, stand = "binom2", terms = NULL,
 \item{explain_var}{Restrict number of PCs to explain at least this fraction of variance.}
 
 \item{max_pcs}{Return at most this number of PCs.}
-
-\item{num_threads}{Number of threads.}
 
 \item{rsvd_threshold}{Use randomized SVD when number of variables exceeds this threshold.}
 

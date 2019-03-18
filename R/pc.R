@@ -9,11 +9,9 @@
 #' @param max_term_size Skip terms annotated with fewer than this number of genes.
 #' @param explain_var Restrict number of PCs to explain at least this fraction of variance.
 #' @param max_pcs Return at most this number of PCs.
-#' @param num_threads Number of threads.
 #' @param rsvd_threshold Use randomized SVD when number of variables exceeds this threshold.
 #' @importFrom fastmatch "%fin%"
-#' @importFrom pbapply pblapply
-#' @importFrom pbmcapply pbmclapply
+#' @importFrom future.apply future_lapply
 #' @return A list of singular value decompositions for each term. Each entry is a list with elements
 #'   \describe{
 #'     \item{\code{u}}{The left-singular vectors.}
@@ -21,7 +19,7 @@
 #'     \item{\code{v}}{The right-singular vectors.}
 #'   }
 #' @export
-compute_term_pcs <- function(o, geno, genemap, stand="binom2", terms=NULL, max_term_size=Inf, min_term_size=2, explain_var=1, max_pcs=Inf, num_threads=1, rsvd_threshold=0) {
+compute_term_pcs <- function(o, geno, genemap, stand="binom2", terms=NULL, max_term_size=Inf, min_term_size=2, explain_var=1, max_pcs=Inf, rsvd_threshold=0) {
   if(class(o) != "ontology") {
     stop("o is not an ontology object.")
   }
@@ -41,13 +39,13 @@ compute_term_pcs <- function(o, geno, genemap, stand="binom2", terms=NULL, max_t
   terms <- intersect(terms, o$id[lengths(o$genes) >= min_term_size])
 
   if(interactive()) message("Extracting gene SNPs.")
-  term_snps <- pblapply(setNames(terms, terms), function(term) {
+  term_snps <- lapply(setNames(terms, terms), function(term) {
     as.character(unique(genemap[genemap$gene %fin% o$genes[[term]], "snp"]))
   })
   term_snps <- term_snps[lengths(term_snps) > 0]
 
   if(interactive()) message("Computing PCs.")
-  pc <- pbmclapply(term_snps, function(snps) tryCatch({
+  pc <- future_lapply(term_snps, function(snps) tryCatch({
     x <- as(geno[,snps], "numeric")
     cv <- apply(x, 2, var, na.rm=TRUE)
     x <- x[, cv > 1e-5, drop=FALSE]
@@ -57,7 +55,7 @@ compute_term_pcs <- function(o, geno, genemap, stand="binom2", terms=NULL, max_t
     } else {
       get_rsvd(x, explain_var, max_pcs)
     }
-  }, error=function(e) return(NULL)), mc.cores=num_threads)
+  }, error=function(e) return(NULL)))
 
   pc[!sapply(pc, is.null)]
 }
@@ -69,7 +67,6 @@ compute_term_pcs <- function(o, geno, genemap, stand="binom2", terms=NULL, max_t
 #' @param stand Which standardization method to use. One of "none", "binom" (old Eigenstrat-style), "binom2" (new Eigenstrat-style), "sd" (zero-mean unit-variance) or "center" (zero mean).
 #' @param explain_var Restrict number of PCs to explain at least this fraction of variance.
 #' @param max_pcs Return at most this number of PCs.
-#' @param num_threads Number of threads.
 #' @param rsvd_threshold Use randomized SVD when number of variables exceeds this threshold.
 #' @return A list of singular value decompositions for each gene Each entry is a list with elements
 #'   \describe{
@@ -77,9 +74,9 @@ compute_term_pcs <- function(o, geno, genemap, stand="binom2", terms=NULL, max_t
 #'     \item{\code{d}}{The non-zero singular values.}
 #'     \item{\code{v}}{The right-singular vectors.}
 #'   }
-#' @importFrom pbmcapply pbmclapply
+#' @importFrom future.apply future_lapply
 #' @export
-compute_gene_pcs <- function(geno, genemap, stand="binom2", explain_var=1, max_pcs=Inf, num_threads=1, rsvd_threshold=0) {
+compute_gene_pcs <- function(geno, genemap, stand="binom2", explain_var=1, max_pcs=Inf, rsvd_threshold=0) {
   if(!("data.frame" %in% class(genemap))) {
     stop("genemap is not a data frame.")
   }
@@ -90,7 +87,7 @@ compute_gene_pcs <- function(geno, genemap, stand="binom2", explain_var=1, max_p
   genes <- split(genemap$snp, genemap$gene)
 
   if(interactive()) message("Computing PCs.")
-  pc <- pbmclapply(genes, function(snps) tryCatch({
+  pc <- future_lapply(genes, function(snps) tryCatch({
     x <- as(geno[,snps], "numeric")
     cv <- apply(x, 2, var, na.rm=TRUE)
     x <- x[, cv > 1e-5, drop=FALSE]
@@ -100,7 +97,7 @@ compute_gene_pcs <- function(geno, genemap, stand="binom2", explain_var=1, max_p
     } else {
       get_rsvd(x, explain_var, max_pcs)
     }
-  }, error=function(e) return(NULL)), mc.cores=num_threads)
+  }, error=function(e) return(NULL)))
 
   pc[!sapply(pc, is.null)]
 }

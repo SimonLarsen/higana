@@ -20,7 +20,6 @@ Imports:
     igraph,
     circlize,
     fastmatch,
-    pbapply,
-    pbmcapply
+    future.apply
 Suggests:
     snpStats
