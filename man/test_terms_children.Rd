@@ -5,7 +5,7 @@
 \title{Check terms for significance against children.}
 \usage{
 test_terms_children(formula, covars, pc, o, family = binomial("logit"),
-  terms = NULL, max_pcs = Inf, num_threads = 1)
+  test = NULL, terms = NULL, max_pcs = Inf, num_threads = 1)
 }
 \arguments{
 \item{formula}{An object of class \code{formula}.}
@@ -23,12 +23,14 @@ test_terms_children(formula, covars, pc, o, family = binomial("logit"),
 \item{max_pcs}{Maximum number of PCs to use per term.}
 
 \item{num_threads}{Number of threads.}
+
+\item{Test}{statistic for model comparison. One of "Chisq", "LRT", "Rao", "F" or "Cp". See \code{\link{stat.anova}}.}
 }
 \value{
 A list with elements:
   \describe{
-    \item{\code{tests}}{Test objects for each term.}
-    \item{\code{pvalue}}{p-values for each term.}
+    \item{\code{test}}{Test objects for each term.}
+    \item{\code{coef}}{Coefficients from each term model.}
   }
 }
 \description{
