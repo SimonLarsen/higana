@@ -5,16 +5,24 @@
 \title{Create mapping from genes to SNPs.}
 \usage{
 make_genemap(snps, ref = "hg19", maxgap = 10000, select = "all",
+  chr.field = c("chr", "chrom", "chromosome"), pos.field = c("bp",
+  "position", "pos"), snp.field = c("snp.name", "snp", "rsid"),
   permute = "none", bins = 100)
 }
 \arguments{
-\item{snps}{A data frame mapping SNPs to genomic positions. Must have the columns "chromosome", "snp.name" and "position".}
+\item{snps}{A data frame mapping SNPs to genomic positions.}
 
 \item{ref}{Reference genome. One of "hg18", "hg19", "hg38", "mm8", "mm9", "mm10", "rn5", "rn6".}
 
 \item{maxgap}{Maximum allowed distance between SNP and gene.}
 
 \item{select}{How should SNPs near multiple genes by mapped? Use "all" to use all hits. Use "nearest" to use only nearest gene.}
+
+\item{chr.field}{A character vector of recognized names for the column in `snps` containing the chromosome name.}
+
+\item{pos.field}{A character vector of recognized names for the column in `snps` containing the SNP position.}
+
+\item{snp.field}{A character vector of recognized names for the column in `snps` containing the SNP name.}
 
 \item{permute}{Permutation method.
 Use "none" for no permutation.
