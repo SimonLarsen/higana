@@ -51,9 +51,9 @@ compute_term_pcs <- function(o, geno, genemap, stand="binom2", terms=NULL, max_t
     x <- x[, cv > 1e-5, drop=FALSE]
     if(stand != "none") x <- scale2(x, stand)
     if(ncol(x) <= rsvd_threshold) {
-      get_svd(x, explain_var, max_pcs)
+      .get_svd(x, explain_var, max_pcs)
     } else {
-      get_rsvd(x, explain_var, max_pcs)
+      .get_rsvd(x, explain_var, max_pcs)
     }
   }, error=function(e) return(NULL)))
 
@@ -93,9 +93,9 @@ compute_gene_pcs <- function(geno, genemap, stand="binom2", explain_var=1, max_p
     x <- x[, cv > 1e-5, drop=FALSE]
     if(stand != "none") x <- scale2(x, stand)
     if(ncol(x) <= rsvd_threshold) {
-      get_svd(x, explain_var, max_pcs)
+      .get_svd(x, explain_var, max_pcs)
     } else {
-      get_rsvd(x, explain_var, max_pcs)
+      .get_rsvd(x, explain_var, max_pcs)
     }
   }, error=function(e) return(NULL)))
 
@@ -103,7 +103,7 @@ compute_gene_pcs <- function(geno, genemap, stand="binom2", explain_var=1, max_p
 }
 
 #' @importFrom corpcor fast.svd
-get_svd <- function(x, explain_var, max_pcs) {
+.get_svd <- function(x, explain_var, max_pcs) {
   sv <- fast.svd(x)
 
   rownames(sv$v) <- colnames(x)
@@ -119,7 +119,7 @@ get_svd <- function(x, explain_var, max_pcs) {
   sv
 }
 
-get_rsvd <- function(x, explain_var, max_pcs) {
+.get_rsvd <- function(x, explain_var, max_pcs) {
   sv <- rsvd(x, max_pcs)
 
   rownames(sv$u) <- rownames(x)
