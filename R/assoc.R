@@ -31,7 +31,7 @@ test_terms <- function(formula, covars, pc, family=binomial("logit"), test=NULL,
   reference.model <- glm(formula, covars, family=family, na.action=na.omit)
 
   out <- future_lapply(pc[terms], function(term) {
-    if(length(term$d > 1)) x <- term$u %*% diag(term$d)
+    if(length(term$d) > 1) x <- term$u %*% diag(term$d)
     else x <- term$u * term$d
 
     if(ncol(x) > max_pcs) x <- x[,seq_len(max_pcs), drop=FALSE]
