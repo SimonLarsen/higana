@@ -1,3 +1,8 @@
+.pcs_from_term <- function(term) {
+  if(length(term$d) > 1) term$u %*% diag(term$d)
+  else term$u * term$d
+}
+
 #' Perform association test for terms.
 #'
 #' @param formula An object of class \code{formula}.
@@ -31,8 +36,7 @@ test_terms <- function(formula, covars, pc, family=binomial("logit"), test=NULL,
   reference.model <- glm(formula, covars, family=family, na.action=na.omit)
 
   out <- future_lapply(pc[terms], function(term) {
-    if(length(term$d) > 1) x <- term$u %*% diag(term$d)
-    else x <- term$u * term$d
+    x <- .pcs_from_term(term)
 
     if(ncol(x) > max_pcs) x <- x[,seq_len(max_pcs), drop=FALSE]
 
@@ -40,10 +44,14 @@ test_terms <- function(formula, covars, pc, family=binomial("logit"), test=NULL,
     D <- cbind(covars, x, stringsAsFactors=FALSE, row.names=NULL)
 
     formula.term <- update(formula, paste0("~ . + ", paste0(colnames(x), collapse="+")))
-    fit <- glm(formula.term, D, family=family, na.action=na.omit, model=FALSE)
+    fit <- glm(formula.term, data=D, family=family, na.action=na.omit, model=FALSE, x=FALSE, y=FALSE)
+
     t <- anova(reference.model, fit, test="LRT")
 
-    list(test=t, coef=coefficients(summary(fit)))
+    list(
+      test=t,
+      coef=coefficients(summary(fit))
+    )
   })
 
   list(
@@ -85,13 +93,14 @@ test_terms_children <- function(formula, covars, pc, o, family=binomial("logit")
   if(is.null(terms)) terms <- names(pc)
   terms <- intersect(terms, go$id[lengths(go$children) > 0])
 
-  out <- future_lapply(terms, function(term) {
-    x.term <- pc[[term]]$u
+  out <- future_lapply(setNames(terms, terms), function(term) {
+    x.term <- .pcs_from_term(pc[[term]])
     if(ncol(x.term) > max_pcs) x.term <- x.term[,seq_len(max_pcs), drop=FALSE]
     colnames(x.term) <- paste0("TERM", seq_len(ncol(x.term)))
 
-    x.child <- lapply(pc[go$children[[term]]], `[[`, "u")
+    x.child <- pc[go$children[[term]]]
     x.child <- x.child[!sapply(x.child, is.null)]
+    x.child <- lapply(x.child, .pcs_from_term)
     x.child <- lapply(x.child, function(y) {
       if(ncol(y) > max_pcs) y <- y[,seq_len(max_pcs), drop=FALSE]
       y
