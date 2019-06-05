@@ -1,11 +1,11 @@
+#*************************************************************************
+#***        Author: N. Benjamin Erichson <nbe@st-andrews.ac.uk>        ***
+#***                              <2015>                               ***
+#***                       License: BSD 3 clause                       ***
+#*************************************************************************
+
 #' @importFrom Matrix crossprod
 rsvd <- function(A, k=NULL, nu=NULL, nv=NULL, p=10, q=2, sdist="normal") {
-    #*************************************************************************
-    #***        Author: N. Benjamin Erichson <nbe@st-andrews.ac.uk>        ***
-    #***                              <2015>                               ***
-    #***                       License: BSD 3 clause                       ***
-    #*************************************************************************
-
     crossprod_help <- function( A , B ) {
       if(is.complex(A)) {
         return( crossprod( Conj(A) , B) )
@@ -57,9 +57,8 @@ rsvd <- function(A, k=NULL, nu=NULL, nv=NULL, p=10, q=2, sdist="normal") {
       nv <- temp
     }
 
-
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    #Generate a random sampling matrix O
+    # Generate a random sampling matrix O
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     O <- switch(sdist,
                 normal = matrix(stats::rnorm(l*n), n, l),
@@ -76,15 +75,15 @@ rsvd <- function(A, k=NULL, nu=NULL, nv=NULL, p=10, q=2, sdist="normal") {
     }
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    #Build sample matrix Y : Y = A * O
-    #Note: Y should approximate the range of A
+    # Build sample matrix Y : Y = A * O
+    # Note: Y should approximate the range of A
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Y <- A %*% O
     remove(O)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    #Orthogonalize Y using economic QR decomposition: Y=QR
-    #If q > 0 perfrom q subspace iterations
+    # Orthogonalize Y using economic QR decomposition: Y=QR
+    # If q > 0 perfrom q subspace iterations
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     if( q > 0 ) {
         for( i in 1:q) {
@@ -100,18 +99,18 @@ rsvd <- function(A, k=NULL, nu=NULL, nv=NULL, p=10, q=2, sdist="normal") {
     remove(Y)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    #Project the data matrix a into a lower dimensional subspace
-    #B := Q.T * A
+     #Project the data matrix a into a lower dimensional subspace
+    # B := Q.T * A
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     B <- crossprod_help(Q , A )
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    #Singular Value Decomposition
-    #Note: B =: U * S * Vt
+    # Singular Value Decomposition
+    # Note: B =: U * S * Vt
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     rsvdObj <- svd(B, nu=nu, nv=nv) # Compute SVD
     #rsvdObj$d <- rsvdObj$d[1:k] # Truncate singular values
-    
+
     if(nu != 0) rsvdObj$u <- Q %*% rsvdObj$u # Recover left singular vectors
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -124,9 +123,9 @@ rsvd <- function(A, k=NULL, nu=NULL, nv=NULL, p=10, q=2, sdist="normal") {
     }
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    #Return
+    # Return
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     if(nu == 0){ rsvdObj$u <- NULL}
     if(nv == 0){ rsvdObj$v <- NULL}
-    return(rsvdObj) 
+    return(rsvdObj)
 }

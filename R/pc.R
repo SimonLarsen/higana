@@ -19,7 +19,7 @@
 #'     \item{\code{v}}{The right-singular vectors.}
 #'   }
 #' @export
-compute_term_pcs <- function(o, geno, genemap, stand="binom2", terms=NULL, max_term_size=Inf, min_term_size=2, explain_var=1, max_pcs=Inf, rsvd_threshold=0) {
+compute_term_pcs <- function(o, geno, genemap, stand="binom2", terms=NULL, max_term_size=75, min_term_size=3, explain_var=0.95, max_pcs=50, rsvd_threshold=0) {
   if(class(o) != "ontology") {
     stop("o is not an ontology object.")
   }

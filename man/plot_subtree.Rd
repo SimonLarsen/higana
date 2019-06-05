@@ -4,18 +4,28 @@
 \alias{plot_subtree}
 \title{Plot part of an ontology as a tree.}
 \usage{
-plot_subtree(o, terms, include_ancestors = TRUE, pvalues = NULL, ...)
+plot_subtree(o, path, terms, pvalues = NULL, include_ancestors = TRUE,
+  highlight = character(0), text_wrap = 20, font = "Arial")
 }
 \arguments{
 \item{o}{An \code{ontology} object.}
 
-\item{terms}{Terms to include in plot.}
+\item{path}{Path to save Graphviz DOT file.}
 
-\item{include_ancestors}{Include the ancestors of terms in the plot.}
+\item{terms}{Character vector of terms to include in the plot.}
 
-\item{pvalues}{A named numeric vector of p-values for each term. Term nodes will be colored according to -log10(p-value) if provided.}
+\item{pvalues}{Named numeric vector of p-values to use for coloring nodes.}
 
-\item{...}{Further arguments to \code{\link{ontologyPlot::onto_plot}}.}
+\item{include_ancestors}{Include all ancestors of terms in `terms`.}
+
+\item{highlight}{Character vector of terms to highlight.}
+
+\item{text_wrap}{Wrap term descriptions at this line width.}
+
+\item{font}{Name of font to use in nodes.}
+}
+\value{
+Path to produced graph.
 }
 \description{
 Plot part of an ontology as a tree.

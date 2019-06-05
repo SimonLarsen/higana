@@ -5,8 +5,8 @@
 \title{Compute principal components of SNPs annotated to ontology terms.}
 \usage{
 compute_term_pcs(o, geno, genemap, stand = "binom2", terms = NULL,
-  max_term_size = Inf, min_term_size = 2, explain_var = 1,
-  max_pcs = Inf, rsvd_threshold = 0)
+  max_term_size = 75, min_term_size = 3, explain_var = 0.95,
+  max_pcs = 50, rsvd_threshold = 0)
 }
 \arguments{
 \item{o}{An annotated \code{ontology} object.}
