@@ -1,10 +1,10 @@
 Package: ontogwas
 Type: Package
-Title: Ontology-based analysis of genomic variants.
+Title: Ontology-based analysis of genetic variants.
 Version: 0.1.0
 Authors@R: person("Simon Jonas", "Larsen", email="simonhffh@gmail.com", role=c("aut","cre"), comment=c(ORCID="0000-0001-8076-5035"))
 Maintainer: Simon J. Larsen <simonhffh@gmail.com>
-Description: Add a description here.
+Description: Package for performing ontology-based association analysis of genetic variants using a principal component regression framework.
 License: MIT + file LICENSE
 URL: https://github.com/SimonLarsen/ontogwas
 BugReports: https://github.com/SimonLarsen/ontogwas/issues

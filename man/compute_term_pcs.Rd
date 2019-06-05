@@ -6,7 +6,8 @@
 \usage{
 compute_term_pcs(o, geno, genemap, stand = "binom2", terms = NULL,
   max_term_size = 75, min_term_size = 3, explain_var = 0.95,
-  max_pcs = 50, rsvd_threshold = 0)
+  max_pcs = 50, exclude_snps = NULL, exclude_genes = NULL,
+  rsvd_threshold = 0)
 }
 \arguments{
 \item{o}{An annotated \code{ontology} object.}
@@ -24,6 +25,10 @@ compute_term_pcs(o, geno, genemap, stand = "binom2", terms = NULL,
 \item{explain_var}{Restrict number of PCs to explain at least this fraction of variance.}
 
 \item{max_pcs}{Return at most this number of PCs.}
+
+\item{exclude_snps}{Named list of SNP IDs to exclude from terms.}
+
+\item{exclude_genes}{Named list of genes to exclude from terms.}
 
 \item{rsvd_threshold}{Use randomized SVD when number of variables exceeds this threshold.}
 

@@ -9,6 +9,8 @@
 #' @param max_term_size Skip terms annotated with fewer than this number of genes.
 #' @param explain_var Restrict number of PCs to explain at least this fraction of variance.
 #' @param max_pcs Return at most this number of PCs.
+#' @param exclude_snps Named list of SNP IDs to exclude from terms.
+#' @param exclude_genes Named list of genes to exclude from terms.
 #' @param rsvd_threshold Use randomized SVD when number of variables exceeds this threshold.
 #' @importFrom fastmatch "%fin%"
 #' @importFrom future.apply future_lapply
@@ -19,7 +21,20 @@
 #'     \item{\code{v}}{The right-singular vectors.}
 #'   }
 #' @export
-compute_term_pcs <- function(o, geno, genemap, stand="binom2", terms=NULL, max_term_size=75, min_term_size=3, explain_var=0.95, max_pcs=50, rsvd_threshold=0) {
+compute_term_pcs <- function(
+    o,
+    geno,
+    genemap,
+    stand="binom2",
+    terms=NULL,
+    max_term_size=75,
+    min_term_size=3,
+    explain_var=0.95,
+    max_pcs=50,
+    exclude_snps=NULL,
+    exclude_genes=NULL,
+    rsvd_threshold=0
+) {
   if(class(o) != "ontology") {
     stop("o is not an ontology object.")
   }
@@ -40,7 +55,9 @@ compute_term_pcs <- function(o, geno, genemap, stand="binom2", terms=NULL, max_t
 
   if(interactive()) message("Extracting gene SNPs.")
   term_snps <- lapply(setNames(terms, terms), function(term) {
-    as.character(unique(genemap[genemap$gene %fin% o$genes[[term]], "snp"]))
+    genes <- setdiff(o$genes[[term]], exclude_genes[[term]])
+    snps <- as.character(unique(genemap[genemap$gene %fin% o$genes[[term]], "snp"]))
+    setdiff(snps, exclude_snps[[term]])
   })
   term_snps <- term_snps[lengths(term_snps) > 0]
 
