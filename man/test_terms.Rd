@@ -25,7 +25,7 @@ test_terms(formula, covars, pc, family = binomial("logit"),
 \value{
 A list with elements:
   \describe{
-    \item{\code{test}}{Test objects for each term.}
+    \item{\code{test}}{Data frame of test statistics.}
     \item{\code{coef}}{Coefficients from each term model.}
   }
 }

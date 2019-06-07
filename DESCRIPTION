@@ -20,7 +20,9 @@ Imports:
     igraph,
     circlize,
     fastmatch,
-    future.apply
+    future.apply,
+    broom,
+    dplyr
 Suggests:
     snpStats,
     DiagrammeR

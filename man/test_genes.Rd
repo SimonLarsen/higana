@@ -16,17 +16,15 @@ test_genes(formula, covars, pc, family = binomial("logit"),
 
 \item{family}{Error distribution and link function to be used in the model. See \code{\link{glm.fit}} for details.}
 
-\item{max_pcs}{Maximum number of PCs to use per gene.}
+\item{test}{Test statistic for model comparison. One of "Chisq", "LRT", "Rao", "F" or "Cp". See \code{\link{stat.anova}}.}
 
-\item{Test}{statistic for model comparison. One of "Chisq", "LRT", "Rao", "F" or "Cp". See \code{\link{stat.anova}}.}
+\item{max_pcs}{Maximum number of PCs to use per gene.}
 }
 \value{
 A list with elements:
   \describe{
-    \item{\code{reference}}{Reference model.}
-    \item{\code{coef}}{Coefficients from each gene model.}
-    \item{\code{tests}}{Test objects for each gene}
-    \item{\code{pvalue}}{p-values for each gene}
+    \item{\code{test}}{Data frame of test statistics.}
+    \item{\code{coef}}{Coefficients from each term model.}
   }
 }
 \description{
