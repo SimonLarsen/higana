@@ -10,7 +10,6 @@
 #' @param explain_var Restrict number of PCs to explain at least this fraction of variance.
 #' @param max_pcs Return at most this number of PCs.
 #' @param exclude_snps Named list of SNP IDs to exclude from terms.
-#' @param exclude_genes Named list of genes to exclude from terms.
 #' @param rsvd_threshold Use randomized SVD when number of variables exceeds this threshold.
 #' @importFrom fastmatch "%fin%"
 #' @importFrom future.apply future_lapply
@@ -32,18 +31,11 @@ compute_term_pcs <- function(
     explain_var=0.95,
     max_pcs=50,
     exclude_snps=NULL,
-    exclude_genes=NULL,
     rsvd_threshold=0
 ) {
-  if(class(o) != "ontology") {
-    stop("o is not an ontology object.")
-  }
-  if(!("data.frame" %in% class(genemap))) {
-    stop("genemap is not a data frame.")
-  }
-  if(!("SnpMatrix" %in% class(geno))) {
-    stop("geno is not a SnpMatrix object.")
-  }
+  if(class(o) != "ontology") stop("o is not an ontology object.")
+  if(!("data.frame" %in% class(genemap))) stop("genemap is not a data frame.")
+  if(!("SnpMatrix" %in% class(geno))) stop("geno is not a SnpMatrix object.")
 
   # use all terms if not provided
   if(is.null(terms)) terms <- o$id
@@ -55,7 +47,6 @@ compute_term_pcs <- function(
 
   if(interactive()) message("Extracting gene SNPs.")
   term_snps <- lapply(setNames(terms, terms), function(term) {
-    genes <- setdiff(o$genes[[term]], exclude_genes[[term]])
     snps <- as.character(unique(genemap[genemap$gene %fin% o$genes[[term]], "snp"]))
     setdiff(snps, exclude_snps[[term]])
   })
@@ -75,6 +66,48 @@ compute_term_pcs <- function(
   }, error=function(e) return(NULL)))
 
   pc[!sapply(pc, is.null)]
+}
+
+#' Compute principal components of ontology terms for stepdown test.
+#'
+#' @param o An annotated \code{ontology} object.
+#' @param geno A \code{SnpMatrix} genotype matrix.
+#' @param genemap A data frame mapping genes to SNP rs numbers.
+#' @param result An association result computed with \code{\link{test_terms}}.
+#' @param terms A character vector of terms to compute PCs for. Will use all terms if not provided.
+#' @param stepdown Step-down method. One of "top.child", "top.gene".
+#' @param ... Further arguments to \code{\link{compute_term_pcs}}.
+#' @importFrom fastmatch "%fin%"
+#' @export
+compute_term_pcs_stepdown <- function(o, geno, genemap, result, terms=NULL, stepdown="top.child", ...) {
+  if(class(o) != "ontology") step("o is not an ontology object.")
+  if(!("data.frame" %in% class(genemap))) stop("genemap is not a data frame.")
+  if(!("SnpMatrix" %in% class(geno))) stop("geno is not a SnpMatrix object.")
+
+  if(is.null(terms)) terms <- o$id
+  stepdown = match.arg(stepdown, c("top.child","top.gene"))
+
+  pvalues <- setNames(result$p.value, result$term)
+
+  if(stepdown == "top.child") {
+    exc.snps <- lapply(setNames(terms, terms), function(term) {
+      top.index <- which.min(pvalues[o$children[[term]]])
+      if(length(top.index) == 0) return(character(0))
+      top.child <- o$children[[term]][[top.index]]
+      top.genes <- o$genes[[top.child]]
+      as.character(unique(genemap[genemap$gene %fin% top.genes, "snp"]))
+    })
+  }
+  else if(stepdown == "top.gene") {
+    exc.snps <- lapply(setNames(terms, terms), function(term) {
+      top.index <- which.min(pvalues[o$genes[[term]]])
+      if(length(top.index) == 0) return(character(0))
+      top.gene <- o$genes[[term]][[top.index]]
+      as.character(unique(genemap[genemap$gene == top.gene, "snp"]))
+    })
+  }
+
+  compute_term_pcs(o, geno, genemap, terms=terms, exclude_snps=exc.snps, ...)
 }
 
 #' Compute principal components of SNPs annotated to genes.

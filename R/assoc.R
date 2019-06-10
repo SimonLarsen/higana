@@ -55,7 +55,8 @@ test_terms <- function(formula, covars, pc, family=binomial("logit"), test=NULL,
   })
 
   tests <- lapply(out, `[[`, "test")
-  tests <- cbind(term=terms, bind_rows(lapply(tests, function(t) tidy(t)[2,])))
+  tests <- suppressWarnings(lapply(tests, function(t) tidy(t)[2,]))
+  tests <- cbind(term=terms, bind_rows(tests))
 
   list(
     coef=lapply(out, `[[`, "coef"),
