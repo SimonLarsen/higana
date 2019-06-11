@@ -1,4 +1,4 @@
-# ontogwas <img src="man/figures/logo.png" align="right" width="100">
+# ontogwas <img src="man/figures/logo.png" align="right" width="120">
 
 Ontology-based analysis of genomic variants.
 
@@ -18,8 +18,10 @@ devtools::install_github("SimonLarsen/ontogwas")
 library(magrittr)
 library(ontogwas)
 
-go <- read_obo("go.obo", c("is_a","part_of")) # 'go.obo' from http://geneontology.org/page/download-ontology
-anno <- read_gaf("goa_human.gaf", exclude_evidence="IEA") # 'goa_human.gaf' from http://geneontology.org/page/download-go-annotations
+# Load 'go.obo' from http://geneontology.org/page/download-ontology
+go <- read_obo("go.obo", c("is_a","part_of"))
+# Load 'goa_human.gaf' from http://geneontology.org/page/download-go-annotations
+anno <- read_gaf("goa_human.gaf", exclude_evidence="IEA")
 
 go <- go %>%
   filter_obsolete() %>%
@@ -28,8 +30,6 @@ go <- go %>%
   filter_unannotated() %>%
   propagate_annotations() %>%
   collapse_redundant_terms(threshold=0.9)
-
-saveRDS(go, "ontology.rds")
 ```
 
 ### Computing principal components
@@ -55,8 +55,10 @@ pvalues <- sapply(results$test, "[", 2, 5)
 ### Visualizing results
 
 ```r
+library(DiagrammeR)
+
 p.adj <- p.adjust(pvalues, "bonferroni")
 sig.terms <- names(which(p.adj < 0.05))
 plot_subtree(go, "tree.dot", sig.terms, pvalues=p.adj)
-DiagrammeR::grViz("tree.dot")
+grViz("tree.dot")
 ```

@@ -33,9 +33,9 @@ compute_term_pcs <- function(
     exclude_snps=NULL,
     rsvd_threshold=0
 ) {
-  if(class(o) != "ontology") stop("o is not an ontology object.")
-  if(!("data.frame" %in% class(genemap))) stop("genemap is not a data frame.")
-  if(!("SnpMatrix" %in% class(geno))) stop("geno is not a SnpMatrix object.")
+  if(class(o) != "ontology") stop("'o' is not an ontology object.")
+  if(!("data.frame" %in% class(genemap))) stop("'genemap' is not a data frame.")
+  if(!("SnpMatrix" %in% class(geno))) stop("'geno' is not a SnpMatrix object.")
 
   # use all terms if not provided
   if(is.null(terms)) terms <- o$id
@@ -80,14 +80,16 @@ compute_term_pcs <- function(
 #' @importFrom fastmatch "%fin%"
 #' @export
 compute_term_pcs_stepdown <- function(o, geno, genemap, result, terms=NULL, stepdown="top.child", ...) {
-  if(class(o) != "ontology") step("o is not an ontology object.")
-  if(!("data.frame" %in% class(genemap))) stop("genemap is not a data frame.")
-  if(!("SnpMatrix" %in% class(geno))) stop("geno is not a SnpMatrix object.")
+  if(class(o) != "ontology") step("'o' is not an ontology object.")
+  if(!("data.frame" %in% class(genemap))) stop("'genemap' is not a data frame.")
+  if(!("SnpMatrix" %in% class(geno))) stop("'geno' is not a SnpMatrix object.")
+  if(!("data.frame" %in% class(result$test))) stop("'result' does not contain a test statistics data frame.")
+  if(!(all(c("term","p.value") %in% colnames(result$test)))) stop("malformed test statistics data frame in 'result'.")
 
   if(is.null(terms)) terms <- o$id
   stepdown = match.arg(stepdown, c("top.child","top.gene"))
 
-  pvalues <- setNames(result$p.value, result$term)
+  pvalues <- setNames(result$test$p.value, result$test$term)
 
   if(stepdown == "top.child") {
     exc.snps <- lapply(setNames(terms, terms), function(term) {
@@ -127,12 +129,8 @@ compute_term_pcs_stepdown <- function(o, geno, genemap, result, terms=NULL, step
 #' @importFrom future.apply future_lapply
 #' @export
 compute_gene_pcs <- function(geno, genemap, stand="binom2", explain_var=1, max_pcs=Inf, rsvd_threshold=0) {
-  if(!("data.frame" %in% class(genemap))) {
-    stop("genemap is not a data frame.")
-  }
-  if(!("SnpMatrix" %in% class(geno))) {
-    stop("geno is not a SnpMatrix object.")
-  }
+  if(!("data.frame" %in% class(genemap))) stop("'genemap' is not a data frame.")
+  if(!("SnpMatrix" %in% class(geno))) stop("'geno' is not a SnpMatrix object.")
 
   genes <- split(genemap$snp, genemap$gene)
 

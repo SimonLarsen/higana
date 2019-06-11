@@ -17,7 +17,7 @@ plot_subtree <- function(o, path, terms, pvalues=NULL, include_ancestors=TRUE, h
 #' @importFrom circlize colorRamp2
 #' @export
 plot_subtree.ontology <- function(o, path, terms, pvalues=NULL, include_ancestors=TRUE, highlight=character(0), text_wrap=20, font="Arial") {
-  if(class(o) != "ontology") stop("o is not an ontology object.")
+  if(class(o) != "ontology") stop("'o' is not an ontology object.")
   if(!is.null(pvalues) && is.null(pvalues)) stop("p-value vector must be named.")
 
   # include ancestors

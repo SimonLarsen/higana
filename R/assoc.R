@@ -23,15 +23,15 @@
 #' @importFrom dplyr bind_rows
 #' @export
 test_terms <- function(formula, covars, pc, family=binomial("logit"), test=NULL, terms=NULL, max_pcs=Inf) {
-  if(class(formula) != "formula") stop("formula is not a formula.")
-  if(!("data.frame" %in% class(covars))) stop("covars is not a data frame.")
+  if(class(formula) != "formula") stop("'formula' is not a formula.")
+  if(!("data.frame" %in% class(covars))) stop("'covars' is not a data frame.")
   if(any(grepl("TERM[0-9]+", colnames(covars)))) stop("Covariates named \"TERM[n]\" where [n] is a number are not allowed.")
   if(any(sapply(pc, is.null))) stop("Principal component vector contains NULL values.")
 
   if(is.null(test)) {
     if(family$family %in% c("binomial","poisson")) test <- "Chisq"
     else if(family$family %in% c("gaussian","quasibinomial","quasipoisson")) test <- "F"
-    else stop("Don't know which test statistic to use for family \"", family$family, "\"")
+    else stop("Don't know which test statistic to use for family \"", family$family, "\". Please specify manually.")
   }
   if(is.null(terms)) terms <- names(pc)
 
