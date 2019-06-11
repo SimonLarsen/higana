@@ -10,13 +10,13 @@
 #' @param font Name of font to use in nodes.
 #' @return Path to produced graph.
 #' @export
-plot_subtree <- function(o, path, terms, pvalues=NULL, include_ancestors=TRUE, highlight=character(0), text_wrap=20, font="Arial") UseMethod("plot_subtree")
+plot_hierarchy <- function(o, path, terms, pvalues=NULL, include_ancestors=TRUE, highlight=character(0), text_wrap=20, font="Arial") UseMethod("plot_hierarchy")
 
 #' @importFrom stringr str_wrap
 #' @importFrom stringr str_to_title
 #' @importFrom circlize colorRamp2
 #' @export
-plot_subtree.ontology <- function(o, path, terms, pvalues=NULL, include_ancestors=TRUE, highlight=character(0), text_wrap=20, font="Arial") {
+plot_hierarchy <- function(o, path, terms, pvalues=NULL, include_ancestors=TRUE, highlight=character(0), text_wrap=20, font="Arial") {
   if(class(o) != "ontology") stop("'o' is not an ontology object.")
   if(!is.null(pvalues) && is.null(pvalues)) stop("p-value vector must be named.")
 
