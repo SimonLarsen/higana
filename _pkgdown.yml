@@ -2,3 +2,32 @@ title: "ontogwas"
 template:
   params:
     bootswatch: cosmo
+reference:
+  - title: Ontology
+    contents:
+      - annotate
+      - collapse_redundant_terms
+      - collapse_terms
+      - compute_redundancy
+      - filter
+      - filter_obsolete
+      - filter_unannotated
+      - make_genemap
+      - permute
+      - propagate_annotations
+      - read_gaf
+      - read_obo
+      - recompute_ancestors
+      - unite_roots
+  - title: Dimensionality reduction
+    contents:
+      - compute_gene_pcs
+      - compute_term_pcs
+      - compute_term_pcs_stepdown
+  - title: Association analysis
+    contents:
+      - test_genes
+      - test_terms
+  - title: Visualization
+    contents:
+      - plot_hierarchy
