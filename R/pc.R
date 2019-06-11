@@ -10,7 +10,7 @@
 #' @param explain_var Restrict number of PCs to explain at least this fraction of variance.
 #' @param max_pcs Return at most this number of PCs.
 #' @param exclude_snps Named list of SNP IDs to exclude from terms.
-#' @param rsvd_threshold Use randomized SVD when number of variables exceeds this threshold.
+#' @param rsvd_threshold Use randomized SVD when number of variables exceeds this threshold. Set to \code{Inf} to turn off.
 #' @importFrom fastmatch "%fin%"
 #' @importFrom future.apply future_lapply
 #' @return A list of singular value decompositions for each term. Each entry is a list with elements
@@ -31,7 +31,7 @@ compute_term_pcs <- function(
     explain_var=0.95,
     max_pcs=50,
     exclude_snps=NULL,
-    rsvd_threshold=0
+    rsvd_threshold=Inf
 ) {
   if(class(o) != "ontology") stop("'o' is not an ontology object.")
   if(!("data.frame" %in% class(genemap))) stop("'genemap' is not a data frame.")
