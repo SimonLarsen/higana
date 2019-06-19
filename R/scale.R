@@ -10,7 +10,7 @@ scale2 <- function(x, type="sd") {
   else if(type == "center") x <- scale(x, center=TRUE, scale=FALSE)
   else if(type == "binom") x <- scale_eigenstrat(x, 1)
   else if(type == "binom2") x <- scale_eigenstrat(x, 2)
-  else stop("Unrecognized standardization method \"", type, "\".")
+  else if(type != "none") stop("Unrecognized standardization method \"", type, "\".")
   
   x[is.na(x)] <- 0
   x
