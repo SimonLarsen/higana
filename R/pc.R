@@ -57,7 +57,7 @@ compute_term_pcs <- function(
     x <- as(geno[,snps], "numeric")
     cv <- apply(x, 2, var, na.rm=TRUE)
     x <- x[, cv > 1e-5, drop=FALSE]
-    if(stand != "none") x <- scale2(x, stand)
+    x <- scale2(x, stand)
     if(ncol(x) <= rsvd_threshold) {
       .get_svd(x, explain_var, max_pcs)
     } else {
@@ -100,7 +100,7 @@ compute_term_pcs_stepdown <- function(o, geno, genemap, result, terms=NULL, step
       as.character(unique(genemap[genemap$gene %fin% top.genes, "snp"]))
     })
   }
-  else if(stepdown == "top.gene") {
+  if(stepdown == "top.gene") {
     exc.snps <- lapply(setNames(terms, terms), function(term) {
       top.index <- which.min(pvalues[o$genes[[term]]])
       if(length(top.index) == 0) return(character(0))
@@ -139,7 +139,7 @@ compute_gene_pcs <- function(geno, genemap, stand="binom2", explain_var=1, max_p
     x <- as(geno[,snps], "numeric")
     cv <- apply(x, 2, var, na.rm=TRUE)
     x <- x[, cv > 1e-5, drop=FALSE]
-    if(stand != "none") x <- scale2(x, stand)
+    x <- scale2(x, stand)
     if(ncol(x) <= rsvd_threshold) {
       .get_svd(x, explain_var, max_pcs)
     } else {
@@ -164,6 +164,8 @@ compute_gene_pcs <- function(geno, genemap, stand="binom2", explain_var=1, max_p
   sv$d <- head(sv$d, numpc)
   sv$u <- sv$u[, seq_len(numpc), drop=FALSE]
   sv$v <- sv$v[, seq_len(numpc), drop=FALSE]
+  sv$scale <- attr(x, "scaled:scale")
+  sv$center <- attr(x, "scaled:center")
   sv
 }
 
@@ -181,5 +183,7 @@ compute_gene_pcs <- function(geno, genemap, stand="binom2", explain_var=1, max_p
   sv$d <- head(sv$d, numpc)
   sv$u <- sv$u[, seq_len(numpc), drop=FALSE]
   sv$v <- sv$v[, seq_len(numpc), drop=FALSE]
+  sv$scale <- attr(x, "scaled:scale")
+  sv$center <- attr(x, "scaled:center")
   sv
 }
