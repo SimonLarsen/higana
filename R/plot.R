@@ -49,12 +49,12 @@ plot_hierarchy <- function(o, path, terms, pvalues=NULL, include_ancestors=TRUE,
     s <- sprintf('  %d [label=<
     <TABLE BORDER="0" CELLPADDING="4" CELLSPACING="0">
       <TR><TD BORDER="0" BGCOLOR="black"><FONT COLOR="white">%s</FONT></TD></TR>
-      <TR><TD BORDER="%d" BGCOLOR="%s">%s</TD></TR>
+      <TR><TD BORDER="%d" COLOR="red" BGCOLOR="%s">%s</TD></TR>
     </TABLE>
   >];',
       i,
       terms[[i]],
-      ifelse(terms[[i]] %in% highlight, 2, 0),
+      ifelse(terms[[i]] %in% highlight, 3, 0),
       fillcolors[[i]],
       labels[[i]]
     )
