@@ -4,7 +4,7 @@
 \alias{annotate}
 \title{Annotate ontology with gene annotations.}
 \usage{
-annotate(o, annotation)
+annotate(o, annotations)
 }
 \arguments{
 \item{o}{An \code{ontology} object.}

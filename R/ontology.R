@@ -131,7 +131,7 @@ unite_roots.ontology <- function(o, roots=NULL, root.name="root") {
 #' @return An \code{ontology} object with annotations.
 #' @importFrom fastmatch fmatch
 #' @export
-annotate <- function(o, annotation) UseMethod("annotate")
+annotate <- function(o, annotations) UseMethod("annotate")
 
 #' @export
 annotate.ontology <- function(o, annotations) {
