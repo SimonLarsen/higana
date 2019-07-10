@@ -1,7 +1,7 @@
 #' Compute principal components of SNPs annotated to ontology terms.
 #'
 #' @param o An annotated \code{ontology} object.
-#' @param geno A \code{SnpMatrix} genotype matrix.
+#' @param geno A \code{BEDMatrix} genotype matrix.
 #' @param genemap A data frame mapping genes to SNP rs numbers.
 #' @param stand Which standardization method to use. One of "none", "binom" (old Eigenstrat-style), "binom2" (new Eigenstrat-style), "sd" (zero-mean unit-variance) or "center" (zero mean).
 #' @param terms A character vector of terms to compute PCs for. Will use all terms if not provided.
@@ -12,6 +12,7 @@
 #' @param exclude_snps Named list of SNP IDs to exclude from terms.
 #' @param rsvd_threshold Use randomized SVD when number of variables exceeds this threshold. Set to \code{Inf} to turn off.
 #' @importFrom fastmatch "%fin%"
+#' @importFrom fastmatch fmatch
 #' @importFrom future.apply future_lapply
 #' @return A list of singular value decompositions for each term. Each entry is a list with elements
 #'   \describe{
@@ -35,7 +36,7 @@ compute_term_pcs <- function(
 ) {
   if(class(o) != "ontology") stop("'o' is not an ontology object.")
   if(!("data.frame" %in% class(genemap))) stop("'genemap' is not a data frame.")
-  if(!("SnpMatrix" %in% class(geno))) stop("'geno' is not a SnpMatrix object.")
+  if(!("BEDMatrix" %in% class(geno))) stop("'geno' is not a BEDMatrix object.")
 
   # use all terms if not provided
   if(is.null(terms)) terms <- o$id
@@ -46,15 +47,17 @@ compute_term_pcs <- function(
   terms <- intersect(terms, o$id[lengths(o$genes) >= min_term_size])
 
   if(interactive()) message("Extracting gene SNPs.")
+  gene2snps <- split(genemap$snp, genemap$gene)
   term_snps <- lapply(setNames(terms, terms), function(term) {
-    snps <- as.character(unique(genemap[genemap$gene %fin% o$genes[[term]], "snp"]))
+    ind <- fmatch(o$genes[[term]], names(gene2snps))
+    snps <- as.character(unique(unlist(gene2snps[ind])))
     setdiff(snps, exclude_snps[[term]])
   })
   term_snps <- term_snps[lengths(term_snps) > 0]
 
   if(interactive()) message("Computing PCs.")
   pc <- future_lapply(term_snps, function(snps) tryCatch({
-    x <- as(geno[,snps], "numeric")
+    x <- geno[,snps]
     cv <- apply(x, 2, var, na.rm=TRUE)
     x <- x[, cv > 1e-5, drop=FALSE]
     x <- scale2(x, stand)
@@ -114,7 +117,7 @@ compute_term_pcs_stepdown <- function(o, geno, genemap, result, terms=NULL, step
 
 #' Compute principal components of SNPs annotated to genes.
 #'
-#' @param geno A \code{SnpMatrix} genotype matrix.
+#' @param geno A \code{BEDMatrix} genotype matrix.
 #' @param genemap A data frame mapping genes to SNP rs numbers.
 #' @param stand Which standardization method to use. One of "none", "binom" (old Eigenstrat-style), "binom2" (new Eigenstrat-style), "sd" (zero-mean unit-variance) or "center" (zero mean).
 #' @param explain_var Restrict number of PCs to explain at least this fraction of variance.
@@ -130,13 +133,13 @@ compute_term_pcs_stepdown <- function(o, geno, genemap, result, terms=NULL, step
 #' @export
 compute_gene_pcs <- function(geno, genemap, stand="binom2", explain_var=1, max_pcs=Inf, rsvd_threshold=0) {
   if(!("data.frame" %in% class(genemap))) stop("'genemap' is not a data frame.")
-  if(!("SnpMatrix" %in% class(geno))) stop("'geno' is not a SnpMatrix object.")
+  if(!("BEDMatrix" %in% class(geno))) stop("'geno' is not a SnpMatrix object.")
 
   genes <- split(genemap$snp, genemap$gene)
 
   if(interactive()) message("Computing PCs.")
   pc <- future_lapply(genes, function(snps) tryCatch({
-    x <- as(geno[,snps], "numeric")
+    x <- geno[,snps]
     cv <- apply(x, 2, var, na.rm=TRUE)
     x <- x[, cv > 1e-5, drop=FALSE]
     x <- scale2(x, stand)

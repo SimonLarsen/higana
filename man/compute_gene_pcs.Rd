@@ -8,7 +8,7 @@ compute_gene_pcs(geno, genemap, stand = "binom2", explain_var = 1,
   max_pcs = Inf, rsvd_threshold = 0)
 }
 \arguments{
-\item{geno}{A \code{SnpMatrix} genotype matrix.}
+\item{geno}{A \code{BEDMatrix} genotype matrix.}
 
 \item{genemap}{A data frame mapping genes to SNP rs numbers.}
 

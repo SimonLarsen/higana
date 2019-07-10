@@ -22,7 +22,7 @@ Imports:
     fastmatch,
     future.apply,
     broom,
-    dplyr
+    dplyr,
+    BEDMatrix
 Suggests:
-    snpStats,
     DiagrammeR
