@@ -26,7 +26,7 @@ plot_hierarchy <- function(o, path, terms, pvalues=NULL, include_ancestors=TRUE,
   }
 
   # prepare term labels
-  labels <- str_wrap(str_to_title(go$name[terms]), width = text_wrap)
+  labels <- str_wrap(str_to_title(o$name[terms]), width = text_wrap)
   labels <- gsub("\n", "<BR/>", labels)
 
   # fill nodes based on p-value if supplied
@@ -65,7 +65,7 @@ plot_hierarchy <- function(o, path, terms, pvalues=NULL, include_ancestors=TRUE,
     pa <- intersect(o$parents[[terms[[i]]]], terms)
 
     pa.trans <- unique(unlist(lapply(pa, function(j) {
-      setdiff(go$ancestors[[j]], j)
+      setdiff(o$ancestors[[j]], j)
     })))
 
     pa <- setdiff(pa, pa.trans)
