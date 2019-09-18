@@ -1,4 +1,4 @@
-Package: ontogwas
+Package: higana
 Type: Package
 Title: Ontology-based analysis of genetic variants.
 Version: 0.1.0
@@ -6,8 +6,8 @@ Authors@R: person("Simon Jonas", "Larsen", email="simonhffh@gmail.com", role=c("
 Maintainer: Simon J. Larsen <simonhffh@gmail.com>
 Description: Package for performing ontology-based association analysis of genetic variants using a principal component regression framework.
 License: MIT + file LICENSE
-URL: https://github.com/SimonLarsen/ontogwas
-BugReports: https://github.com/SimonLarsen/ontogwas/issues
+URL: https://github.com/SimonLarsen/higana
+BugReports: https://github.com/SimonLarsen/higana/issues
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
@@ -25,4 +25,7 @@ Imports:
     dplyr,
     BEDMatrix
 Suggests:
-    DiagrammeR
+    DiagrammeR,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
