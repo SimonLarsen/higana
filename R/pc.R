@@ -74,7 +74,7 @@ compute_term_pcs <- function(
 #' Compute principal components of ontology terms for stepdown test.
 #'
 #' @param o An annotated \code{ontology} object.
-#' @param geno A \code{SnpMatrix} genotype matrix.
+#' @param geno A \code{BEDMatrix} genotype matrix.
 #' @param genemap A data frame mapping genes to SNP rs numbers.
 #' @param result An association result computed with \code{\link{test_terms}}.
 #' @param terms A character vector of terms to compute PCs for. Will use all terms if not provided.
@@ -85,7 +85,7 @@ compute_term_pcs <- function(
 compute_term_pcs_stepdown <- function(o, geno, genemap, result, terms=NULL, stepdown="top.child", ...) {
   if(class(o) != "ontology") step("'o' is not an ontology object.")
   if(!("data.frame" %in% class(genemap))) stop("'genemap' is not a data frame.")
-  if(!("SnpMatrix" %in% class(geno))) stop("'geno' is not a SnpMatrix object.")
+  if(!("BEDMatrix" %in% class(geno))) stop("'geno' is not a BEDMatrix object.")
   if(!("data.frame" %in% class(result$test))) stop("'result' does not contain a test statistics data frame.")
   if(!(all(c("term","p.value") %in% colnames(result$test)))) stop("malformed test statistics data frame in 'result'.")
 
@@ -133,7 +133,7 @@ compute_term_pcs_stepdown <- function(o, geno, genemap, result, terms=NULL, step
 #' @export
 compute_gene_pcs <- function(geno, genemap, stand="binom2", explain_var=1, max_pcs=Inf, rsvd_threshold=0) {
   if(!("data.frame" %in% class(genemap))) stop("'genemap' is not a data frame.")
-  if(!("BEDMatrix" %in% class(geno))) stop("'geno' is not a SnpMatrix object.")
+  if(!("BEDMatrix" %in% class(geno))) stop("'geno' is not a BEDMatrix object.")
 
   genes <- split(genemap$snp, genemap$gene)
 

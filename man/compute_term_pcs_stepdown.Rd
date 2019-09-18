@@ -10,7 +10,7 @@ compute_term_pcs_stepdown(o, geno, genemap, result, terms = NULL,
 \arguments{
 \item{o}{An annotated \code{ontology} object.}
 
-\item{geno}{A \code{SnpMatrix} genotype matrix.}
+\item{geno}{A \code{BEDMatrix} genotype matrix.}
 
 \item{genemap}{A data frame mapping genes to SNP rs numbers.}
 
