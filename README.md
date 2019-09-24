@@ -1,6 +1,6 @@
 # HiGAna <img src="man/figures/logo.png" align="right" width="120">
 
-Ontology-based analysis of genomic variants.
+A cell-hierarchy based method for genetic association studies.
 
 ## Installation
 
@@ -24,5 +24,4 @@ If you use HiGAna in your research please cite the following publication:
 
 If you want to contact us regarding HiGAna please contact us in the following order:
 
-* Simon Larsen: simonhffh |at| gmail [dot] com
-* ...
+* Simon Larsen: simonhffh AT gmail DOT com
