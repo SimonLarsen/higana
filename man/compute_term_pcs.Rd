@@ -4,16 +4,14 @@
 \alias{compute_term_pcs}
 \title{Compute principal components of SNPs annotated to ontology terms.}
 \usage{
-compute_term_pcs(o, geno, genemap, stand = "binom2", terms = NULL,
+compute_term_pcs(o, data, stand = "binom2", terms = NULL,
   max_term_size = 75, min_term_size = 3, explain_var = 0.95,
   max_pcs = 50, exclude_snps = NULL, rsvd_threshold = Inf)
 }
 \arguments{
 \item{o}{An annotated \code{ontology} object.}
 
-\item{geno}{A \code{BEDMatrix} genotype matrix.}
-
-\item{genemap}{A data frame mapping genes to SNP rs numbers.}
+\item{data}{A \code{BEDData} object}
 
 \item{stand}{Which standardization method to use. One of "none", "binom" (old Eigenstrat-style), "binom2" (new Eigenstrat-style), "sd" (zero-mean unit-variance) or "center" (zero mean).}
 

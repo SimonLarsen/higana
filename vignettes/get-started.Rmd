@@ -34,9 +34,8 @@ go <- go %>%
 library(snpStats)
 
 go <- readRDS("ontology.rds")
-snps <- read.plink("geno.bed", "geno.bim", "geno.fam")
-genemap <- make_genemap(snps$map, "hg19", maxgap=10e3)
-pc <- compute_term_pcs(go, snps$genotypes, genemap)
+bed <- read_bed("geno.bed", hg19")
+pcs <- compute_term_pcs(go, bed)
 ```
 
 ## Performing association tests
@@ -44,8 +43,12 @@ pc <- compute_term_pcs(go, snps$genotypes, genemap)
 ```r
 covars <- read.table("covars.tsv")
 
-results <- test_terms(class ~ sex+age+PC1+PC2+PC3+PC4, covars, go, pc, family=binomial("logit"))
-pvalues <- sapply(results$test, "[", 2, 5)
+# Test each term
+results <- test_terms(class ~ sex+age+PC1+PC2+PC3+PC4, covars, go, pcs, family=binomial("logit"))
+
+# Print top 10 terms
+test <- results$test[order(results$test$p.value),]
+print(head(test))
 ```
 
 ## Visualizing results
@@ -53,6 +56,7 @@ pvalues <- sapply(results$test, "[", 2, 5)
 ```r
 library(DiagrammeR)
 
+test$adj.p <- p.adjust(test$p.value, "bonferroni")
 p.adj <- p.adjust(pvalues, "bonferroni")
 sig.terms <- names(which(p.adj < 0.05))
 plot_hierarchy(go, "tree.dot", sig.terms, pvalues=p.adj)

@@ -4,15 +4,13 @@
 \alias{compute_term_pcs_stepdown}
 \title{Compute principal components of ontology terms for stepdown test.}
 \usage{
-compute_term_pcs_stepdown(o, geno, genemap, result, terms = NULL,
+compute_term_pcs_stepdown(o, data, result, terms = NULL,
   stepdown = "top.child", ...)
 }
 \arguments{
 \item{o}{An annotated \code{ontology} object.}
 
-\item{geno}{A \code{BEDMatrix} genotype matrix.}
-
-\item{genemap}{A data frame mapping genes to SNP rs numbers.}
+\item{data}{A \code{BEDData} object.}
 
 \item{result}{An association result computed with \code{\link{test_terms}}.}
 

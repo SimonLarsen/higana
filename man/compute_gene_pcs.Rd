@@ -4,13 +4,11 @@
 \alias{compute_gene_pcs}
 \title{Compute principal components of SNPs annotated to genes.}
 \usage{
-compute_gene_pcs(geno, genemap, stand = "binom2", explain_var = 1,
+compute_gene_pcs(data, stand = "binom2", explain_var = 1,
   max_pcs = Inf, rsvd_threshold = 0)
 }
 \arguments{
-\item{geno}{A \code{BEDMatrix} genotype matrix.}
-
-\item{genemap}{A data frame mapping genes to SNP rs numbers.}
+\item{data}{A \code{BEDData} object.}
 
 \item{stand}{Which standardization method to use. One of "none", "binom" (old Eigenstrat-style), "binom2" (new Eigenstrat-style), "sd" (zero-mean unit-variance) or "center" (zero mean).}
 
