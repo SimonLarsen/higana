@@ -1,5 +1,6 @@
 #' Compute principal components of SNPs annotated to ontology terms.
 #'
+#' @param path Path to output file.
 #' @param o An annotated \code{ontology} object.
 #' @param data A \code{BEDData} object
 #' @param stand Which standardization method to use. One of "none", "binom" (old Eigenstrat-style), "binom2" (new Eigenstrat-style), "sd" (zero-mean unit-variance) or "center" (zero mean).
@@ -8,27 +9,22 @@
 #' @param max_term_size Skip terms annotated with fewer than this number of genes.
 #' @param explain_var Restrict number of PCs to explain at least this fraction of variance.
 #' @param max_pcs Return at most this number of PCs.
+#' @param num_parts Number of parts to write output to.
 #' @param exclude_snps Named list of SNP IDs to exclude from terms.
 #' @param rsvd_threshold Use randomized SVD when number of variables exceeds this threshold. Set to \code{Inf} to turn off.
-#' @importFrom fastmatch "%fin%"
 #' @importFrom fastmatch fmatch
-#' @importFrom future.apply future_lapply
-#' @return A list of singular value decompositions for each term. Each entry is a list with elements
-#'   \describe{
-#'     \item{\code{u}}{The left-singular vectors.}
-#'     \item{\code{d}}{The non-zero singular values.}
-#'     \item{\code{v}}{The right-singular vectors.}
-#'   }
 #' @export
 compute_term_pcs <- function(
+    path,
     o,
     data,
-    stand="binom2",
     terms=NULL,
+    stand="binom2",
     max_term_size=75,
     min_term_size=3,
     explain_var=0.95,
     max_pcs=50,
+    num_parts=1,
     exclude_snps=NULL,
     rsvd_threshold=Inf
 ) {
@@ -43,6 +39,7 @@ compute_term_pcs <- function(
   # restrict to terms above min_term_size
   terms <- intersect(terms, o$id[lengths(o$genes) >= min_term_size])
 
+  # Extract SNPs for each term
   if(interactive()) message("Extracting gene SNPs.")
   gene2snps <- split(data$map$snp, data$map$gene)
   term_snps <- lapply(setNames(terms, terms), function(term) {
@@ -52,24 +49,25 @@ compute_term_pcs <- function(
   })
   term_snps <- term_snps[lengths(term_snps) > 0]
 
-  if(interactive()) message("Computing PCs.")
-  pc <- future_lapply(term_snps, function(snps) tryCatch({
-    x <- data$snps[,snps]
-    cv <- apply(x, 2, var, na.rm=TRUE)
-    x <- x[, cv > 1e-5, drop=FALSE]
-    x <- scale2(x, stand)
-    if(ncol(x) <= rsvd_threshold) {
-      .get_svd(x, explain_var, max_pcs)
-    } else {
-      .get_rsvd(x, explain_var, max_pcs)
-    }
-  }, error=function(e) return(NULL)))
+  # Separate terms into parts
+  term_snps <- .split_into_parts(term_snps, num_parts)
 
-  pc[!sapply(pc, is.null)]
+  out <- list(num_parts=num_parts)
+  out$terms <- lapply(seq_len(num_parts), function(part) {
+    if(interactive()) message(sprintf("Computing PCs (%d/%d).", part, num_parts))
+
+    pc <- .compute_snp_pcs(data, term_snps[[part]], stand, explain_var, max_pcs, rsvd_threshold)
+    pc <- pc[!sapply(pc, is.null)]
+    saveRDS(pc, paste0(path, ".part", part))
+    names(pc)
+  })
+
+  saveRDS(out, path)
 }
 
 #' Compute principal components of ontology terms for stepdown test.
 #'
+#' @param path Path to output file.
 #' @param o An annotated \code{ontology} object.
 #' @param data A \code{BEDData} object.
 #' @param result An association result computed with \code{\link{test_terms}}.
@@ -78,7 +76,15 @@ compute_term_pcs <- function(
 #' @param ... Further arguments to \code{\link{compute_term_pcs}}.
 #' @importFrom fastmatch "%fin%"
 #' @export
-compute_term_pcs_stepdown <- function(o, data, result, terms=NULL, stepdown="top.child", ...) {
+compute_term_pcs_stepdown <- function(
+  path,
+  o,
+  data,
+  result,
+  terms=NULL,
+  stepdown="top.child",
+  ...
+) {
   if(class(o) != "ontology") step("'o' is not an ontology object.")
   if(!("BEDData" %in% class(data))) stop("'data' is not a BEDData object.")
   if(!("data.frame" %in% class(result$test))) stop("'result' does not contain a test statistics data frame.")
@@ -107,15 +113,17 @@ compute_term_pcs_stepdown <- function(o, data, result, terms=NULL, stepdown="top
     })
   }
 
-  compute_term_pcs(o, data, terms=terms, exclude_snps=exc.snps, ...)
+  compute_term_pcs(path, o, data, terms=terms, exclude_snps=exc.snps, ...)
 }
 
 #' Compute principal components of SNPs annotated to genes.
 #'
+#' @param path Path to output file.
 #' @param data A \code{BEDData} object. 
 #' @param stand Which standardization method to use. One of "none", "binom" (old Eigenstrat-style), "binom2" (new Eigenstrat-style), "sd" (zero-mean unit-variance) or "center" (zero mean).
 #' @param explain_var Restrict number of PCs to explain at least this fraction of variance.
 #' @param max_pcs Return at most this number of PCs.
+#' @param num_parts Number of parts to write output to.
 #' @param rsvd_threshold Use randomized SVD when number of variables exceeds this threshold.
 #' @return A list of singular value decompositions for each gene Each entry is a list with elements
 #'   \describe{
@@ -123,15 +131,37 @@ compute_term_pcs_stepdown <- function(o, data, result, terms=NULL, stepdown="top
 #'     \item{\code{d}}{The non-zero singular values.}
 #'     \item{\code{v}}{The right-singular vectors.}
 #'   }
-#' @importFrom future.apply future_lapply
 #' @export
-compute_gene_pcs <- function(data, stand="binom2", explain_var=1, max_pcs=Inf, rsvd_threshold=0) {
+compute_gene_pcs <- function(
+  path,
+  data,
+  stand="binom2",
+  explain_var=0.95,
+  max_pcs=50,
+  num_parts=1,
+  rsvd_threshold=Inf
+) {
   if(class(data) != "BEDData") stop("'data' is not a BEDData object.")
 
-  genes <- split(data$map$snp, data$map$gene)
+  gene_snps <- split(data$map$snp, data$map$gene)
+  gene_snps <- .split_into_parts(gene_snps, num_parts)
 
-  if(interactive()) message("Computing PCs.")
-  pc <- future_lapply(genes, function(snps) tryCatch({
+  out <- list(num_parts=num_parts)
+  out$terms <- lapply(seq_len(num_parts), function(part) {
+    if(interactive()) message(sprintf("Computing PCs (%d/%d).", part, num_parts))
+
+    pc <- .compute_snp_pcs(data, gene_snps[[part]], stand, explain_var, max_pcs, rsvd_threshold)
+    pc <- pc[!sapply(pc, is.null)]
+    saveRDS(pc, paste0(path, ".part", part))
+    names(pc)
+  })
+
+  saveRDS(out, path)
+}
+
+#' @importFrom future.apply future_lapply
+.compute_snp_pcs <- function(data, term_snps, stand, explain_var, max_pcs, rsvd_threshold) {
+  future_lapply(term_snps, function(snps) tryCatch({
     x <- data$snps[,snps]
     cv <- apply(x, 2, var, na.rm=TRUE)
     x <- x[, cv > 1e-5, drop=FALSE]
@@ -142,9 +172,8 @@ compute_gene_pcs <- function(data, stand="binom2", explain_var=1, max_pcs=Inf, r
       .get_rsvd(x, explain_var, max_pcs)
     }
   }, error=function(e) return(NULL)))
-
-  pc[!sapply(pc, is.null)]
 }
+
 
 #' @importFrom corpcor fast.svd
 .get_svd <- function(x, explain_var, max_pcs) {
@@ -182,4 +211,10 @@ compute_gene_pcs <- function(data, stand="binom2", explain_var=1, max_pcs=Inf, r
   sv$scale <- attr(x, "scaled:scale")
   sv$center <- attr(x, "scaled:center")
   sv
+}
+
+.split_into_parts <- function(sets, num_parts) {
+  part <- rep(seq_len(num_parts), length.out=length(sets))
+  part <- sample(part)
+  split(sets, part)
 }

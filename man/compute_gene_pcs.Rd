@@ -4,10 +4,12 @@
 \alias{compute_gene_pcs}
 \title{Compute principal components of SNPs annotated to genes.}
 \usage{
-compute_gene_pcs(data, stand = "binom2", explain_var = 1,
-  max_pcs = Inf, rsvd_threshold = 0)
+compute_gene_pcs(path, data, stand = "binom2", explain_var = 0.95,
+  max_pcs = 50, num_parts = 1, rsvd_threshold = Inf)
 }
 \arguments{
+\item{path}{Path to output file.}
+
 \item{data}{A \code{BEDData} object.}
 
 \item{stand}{Which standardization method to use. One of "none", "binom" (old Eigenstrat-style), "binom2" (new Eigenstrat-style), "sd" (zero-mean unit-variance) or "center" (zero mean).}
@@ -15,6 +17,8 @@ compute_gene_pcs(data, stand = "binom2", explain_var = 1,
 \item{explain_var}{Restrict number of PCs to explain at least this fraction of variance.}
 
 \item{max_pcs}{Return at most this number of PCs.}
+
+\item{num_parts}{Number of parts to write output to.}
 
 \item{rsvd_threshold}{Use randomized SVD when number of variables exceeds this threshold.}
 }

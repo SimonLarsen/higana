@@ -4,19 +4,17 @@
 \alias{test_terms}
 \title{Perform association test for terms.}
 \usage{
-test_terms(formula, covars, pc, family = binomial("logit"),
-  test = NULL, terms = NULL, max_pcs = Inf)
+test_terms(path, formula, covars, family = binomial("logit"),
+  test = NULL, max_pcs = Inf)
 }
 \arguments{
+\item{path}{Path to PC data.}
+
 \item{formula}{An object of class \code{formula}.}
 
 \item{covars}{A data frame containing covariates.}
 
-\item{pc}{Named list of PCs from terms. Computed with \code{\link{compute_term_pcs}}.}
-
 \item{family}{Error distribution and link function to be used in the model. See \code{\link{glm.fit}} for details.}
-
-\item{terms}{Character vector of terms to test. Defaults to all terms.}
 
 \item{max_pcs}{Maximum number of PCs to use per term.}
 

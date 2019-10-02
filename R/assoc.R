@@ -5,12 +5,11 @@
 
 #' Perform association test for terms.
 #'
+#' @param path Path to PC data.
 #' @param formula An object of class \code{formula}.
 #' @param covars A data frame containing covariates.
-#' @param pc Named list of PCs from terms. Computed with \code{\link{compute_term_pcs}}.
 #' @param family Error distribution and link function to be used in the model. See \code{\link{glm.fit}} for details.
 #' @param Test statistic for model comparison. One of "Chisq", "LRT", "Rao", "F" or "Cp". See \code{\link{stat.anova}}.
-#' @param terms Character vector of terms to test. Defaults to all terms.
 #' @param max_pcs Maximum number of PCs to use per term.
 #' @return A list with elements:
 #'   \describe{
@@ -22,11 +21,10 @@
 #' @importFrom broom tidy
 #' @importFrom dplyr bind_rows
 #' @export
-test_terms <- function(formula, covars, pc, family=binomial("logit"), test=NULL, terms=NULL, max_pcs=Inf) {
+test_terms <- function(path, formula, covars, family=binomial("logit"), test=NULL, max_pcs=Inf) {
   if(class(formula) != "formula") stop("'formula' is not a formula.")
   if(!("data.frame" %in% class(covars))) stop("'covars' is not a data frame.")
   if(any(grepl("TERM[0-9]+", colnames(covars)))) stop("Covariates named \"TERM[n]\" where [n] is a number are not allowed.")
-  if(any(sapply(pc, is.null))) stop("Principal component vector contains NULL values.")
 
   if(is.null(test)) {
     if(family$family %in% c("binomial","poisson")) test <- "Chisq"
@@ -37,26 +35,35 @@ test_terms <- function(formula, covars, pc, family=binomial("logit"), test=NULL,
 
   reference.model <- glm(formula, covars, family=family, na.action=na.omit)
 
-  out <- future_lapply(pc[terms], function(term) {
-    x <- .pcs_from_term(term)
+  base <- readRDS(path)
+  num_parts <- base$num_parts
 
-    if(ncol(x) > max_pcs) x <- x[,seq_len(max_pcs), drop=FALSE]
+  out <- lapply(seq_len(num_parts), function(part) {
+    pc <- readRDS(paste0(path, ".part", part))
 
-    colnames(x) <- paste0("TERM", seq_len(ncol(x)))
-    D <- cbind(covars, x, stringsAsFactors=FALSE, row.names=NULL)
+    future_lapply(pc, function(term) {
+      x <- .pcs_from_term(term)
 
-    formula.term <- update(formula, paste0("~ . + ", paste0(colnames(x), collapse="+")))
-    fit <- glm(formula.term, data=D, family=family, na.action=na.omit, model=FALSE, x=FALSE, y=FALSE)
+      if(ncol(x) > max_pcs) x <- x[,seq_len(max_pcs), drop=FALSE]
 
-    list(
-      test=anova(reference.model, fit, test=test),
-      coef=coefficients(summary(fit))
-    )
+      colnames(x) <- paste0("TERM", seq_len(ncol(x)))
+      D <- cbind(covars, x, stringsAsFactors=FALSE, row.names=NULL)
+
+      formula.term <- update(formula, paste0("~ . + ", paste0(colnames(x), collapse="+")))
+      fit <- glm(formula.term, data=D, family=family, na.action=na.omit, model=FALSE, x=FALSE, y=FALSE)
+
+      list(
+        test=anova(reference.model, fit, test=test),
+        coef=coefficients(summary(fit))
+      )
+    })
   })
+
+  out <- unlist(out, recursive=FALSE)
 
   tests <- lapply(out, `[[`, "test")
   tests <- suppressWarnings(lapply(tests, function(t) tidy(t)[2,]))
-  tests <- cbind(term=terms, bind_rows(tests), stringsAsFactors=FALSE)
+  tests <- cbind(term=names(out), bind_rows(tests), stringsAsFactors=FALSE)
 
   list(
     coef=lapply(out, `[[`, "coef"),
@@ -66,9 +73,9 @@ test_terms <- function(formula, covars, pc, family=binomial("logit"), test=NULL,
 
 #' Perform association test for genes.
 #'
+#' @param path Path to PC data.
 #' @param formula An object of class \code{formula}.
 #' @param covars A data frame containing covariates.
-#' @param pc Named list of PCs from genes. Computed with \code{\link{compute_gene_pcs}}.
 #' @param family Error distribution and link function to be used in the model. See \code{\link{glm.fit}} for details.
 #' @param test Test statistic for model comparison. One of "Chisq", "LRT", "Rao", "F" or "Cp". See \code{\link{stat.anova}}.
 #' @param max_pcs Maximum number of PCs to use per gene.
@@ -78,6 +85,6 @@ test_terms <- function(formula, covars, pc, family=binomial("logit"), test=NULL,
 #'     \item{\code{coef}}{Coefficients from each term model.}
 #'   }
 #' @export
-test_genes <- function(formula, covars, pc, family=binomial("logit"), test=NULL, max_pcs=Inf) {
-  test_terms(formula, covars, pc, family=family, test=test, max_pcs=max_pcs)
+test_genes <- function(path, formula, covars, family=binomial("logit"), test=NULL, max_pcs=Inf) {
+  test_terms(path, formula, covars, family=family, test=test, max_pcs=max_pcs)
 }

@@ -4,18 +4,21 @@
 \alias{compute_term_pcs}
 \title{Compute principal components of SNPs annotated to ontology terms.}
 \usage{
-compute_term_pcs(o, data, stand = "binom2", terms = NULL,
+compute_term_pcs(path, o, data, terms = NULL, stand = "binom2",
   max_term_size = 75, min_term_size = 3, explain_var = 0.95,
-  max_pcs = 50, exclude_snps = NULL, rsvd_threshold = Inf)
+  max_pcs = 50, num_parts = 1, exclude_snps = NULL,
+  rsvd_threshold = Inf)
 }
 \arguments{
+\item{path}{Path to output file.}
+
 \item{o}{An annotated \code{ontology} object.}
 
 \item{data}{A \code{BEDData} object}
 
-\item{stand}{Which standardization method to use. One of "none", "binom" (old Eigenstrat-style), "binom2" (new Eigenstrat-style), "sd" (zero-mean unit-variance) or "center" (zero mean).}
-
 \item{terms}{A character vector of terms to compute PCs for. Will use all terms if not provided.}
+
+\item{stand}{Which standardization method to use. One of "none", "binom" (old Eigenstrat-style), "binom2" (new Eigenstrat-style), "sd" (zero-mean unit-variance) or "center" (zero mean).}
 
 \item{max_term_size}{Skip terms annotated with more than this number of genes.}
 
@@ -23,19 +26,13 @@ compute_term_pcs(o, data, stand = "binom2", terms = NULL,
 
 \item{max_pcs}{Return at most this number of PCs.}
 
+\item{num_parts}{Number of parts to write output to.}
+
 \item{exclude_snps}{Named list of SNP IDs to exclude from terms.}
 
 \item{rsvd_threshold}{Use randomized SVD when number of variables exceeds this threshold. Set to \code{Inf} to turn off.}
 
 \item{max_term_size}{Skip terms annotated with fewer than this number of genes.}
-}
-\value{
-A list of singular value decompositions for each term. Each entry is a list with elements
-  \describe{
-    \item{\code{u}}{The left-singular vectors.}
-    \item{\code{d}}{The non-zero singular values.}
-    \item{\code{v}}{The right-singular vectors.}
-  }
 }
 \description{
 Compute principal components of SNPs annotated to ontology terms.
