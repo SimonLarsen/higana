@@ -47,8 +47,7 @@ covars <- read.table("covars.tsv")
 results <- test_terms("terms.pcs", class ~ sex+age+PC1+PC2+PC3+PC4, covars, go, family=binomial("logit"))
 
 # Print top 10 terms
-test <- results$test[order(results$test$p.value),]
-print(head(test))
+print(head(results$test, 10))
 ```
 
 ## Visualizing results
@@ -56,9 +55,8 @@ print(head(test))
 ```r
 library(DiagrammeR)
 
-test$adj.p <- p.adjust(test$p.value, "bonferroni")
-p.adj <- p.adjust(pvalues, "bonferroni")
-sig.terms <- names(which(p.adj < 0.05))
-plot_hierarchy(go, "tree.dot", sig.terms, pvalues=p.adj)
+adj.p <- p.adjust(results$test$p.value, "bonferroni")
+sig.terms <- results$test$term[adj.p < 0.05]
+plot_hierarchy("tree.dot", go, terms=sig.terms, test=results)
 grViz("tree.dot")
 ```

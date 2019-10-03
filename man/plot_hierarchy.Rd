@@ -4,18 +4,17 @@
 \alias{plot_hierarchy}
 \title{Plot part of an ontology as a tree.}
 \usage{
-plot_hierarchy(o, path, terms, pvalues = NULL,
-  include_ancestors = TRUE, highlight = character(0), text_wrap = 20,
-  font = "Arial")
+plot_hierarchy(path, o, terms, test = NULL, include_ancestors = TRUE,
+  highlight = character(0), text_wrap = 20, font = "Arial")
 }
 \arguments{
-\item{o}{An \code{ontology} object.}
-
 \item{path}{Path to save Graphviz DOT file.}
+
+\item{o}{An \code{ontology} object.}
 
 \item{terms}{Character vector of terms to include in the plot.}
 
-\item{pvalues}{Named numeric vector of p-values to use for coloring nodes.}
+\item{test}{Test result object computed with \code{\link{test_terms}}. Used to color terms according to p-value.}
 
 \item{include_ancestors}{Include all ancestors of terms in `terms`.}
 

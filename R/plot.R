@@ -1,22 +1,22 @@
 #' Plot part of an ontology as a tree.
 #'
-#' @param o An \code{ontology} object.
 #' @param path Path to save Graphviz DOT file.
+#' @param o An \code{ontology} object.
 #' @param terms Character vector of terms to include in the plot.
-#' @param pvalues Named numeric vector of p-values to use for coloring nodes.
+#' @param test Test result object computed with \code{\link{test_terms}}. Used to color terms according to p-value.
 #' @param include_ancestors Include all ancestors of terms in `terms`.
 #' @param highlight Character vector of terms to highlight.
 #' @param text_wrap Wrap term descriptions at this line width.
 #' @param font Name of font to use in nodes.
 #' @return Path to produced graph.
 #' @export
-plot_hierarchy <- function(o, path, terms, pvalues=NULL, include_ancestors=TRUE, highlight=character(0), text_wrap=20, font="Arial") UseMethod("plot_hierarchy")
+plot_hierarchy <- function(path, o, terms, test=NULL, include_ancestors=TRUE, highlight=character(0), text_wrap=20, font="Arial") UseMethod("plot_hierarchy")
 
 #' @importFrom stringr str_wrap
 #' @importFrom stringr str_to_title
 #' @importFrom circlize colorRamp2
 #' @export
-plot_hierarchy <- function(o, path, terms, pvalues=NULL, include_ancestors=TRUE, highlight=character(0), text_wrap=20, font="Arial") {
+plot_hierarchy <- function(path, o, terms, test=NULL, include_ancestors=TRUE, highlight=character(0), text_wrap=20, font="Arial") {
   if(class(o) != "ontology") stop("'o' is not an ontology object.")
   if(!is.null(pvalues) && is.null(pvalues)) stop("p-value vector must be named.")
 
@@ -30,7 +30,8 @@ plot_hierarchy <- function(o, path, terms, pvalues=NULL, include_ancestors=TRUE,
   labels <- gsub("\n", "<BR/>", labels)
 
   # fill nodes based on p-value if supplied
-  if(!is.null(pvalues)) {
+  if(!is.null(test)) {
+    pvalues <- setNames(test$test$p.value, test$test$term)
     pvalues2 <- setNames(pvalues[terms], terms)
     pvalues2[is.na(pvalues2)] <- 1
 
