@@ -35,7 +35,7 @@ library(snpStats)
 
 go <- readRDS("ontology.rds")
 bed <- read_bed("geno.bed", hg19")
-pcs <- compute_term_pcs(go, bed)
+pcs <- compute_term_pcs("terms.pcs", go, bed, num_parts=10)
 ```
 
 ## Performing association tests
@@ -44,7 +44,7 @@ pcs <- compute_term_pcs(go, bed)
 covars <- read.table("covars.tsv")
 
 # Test each term
-results <- test_terms(class ~ sex+age+PC1+PC2+PC3+PC4, covars, go, pcs, family=binomial("logit"))
+results <- test_terms("terms.pcs", class ~ sex+age+PC1+PC2+PC3+PC4, covars, go, family=binomial("logit"))
 
 # Print top 10 terms
 test <- results$test[order(results$test$p.value),]
