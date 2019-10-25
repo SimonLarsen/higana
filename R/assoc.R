@@ -20,6 +20,7 @@
 #' @importFrom fastmatch "%fin%"
 #' @importFrom broom tidy
 #' @importFrom dplyr bind_rows
+#' @importFrom dplyr arrange
 #' @export
 test_terms <- function(path, formula, covars, family=binomial("logit"), test=NULL, max_pcs=Inf) {
   if(class(formula) != "formula") stop("'formula' is not a formula.")
