@@ -24,6 +24,7 @@ reference:
       - compute_gene_pcs
       - compute_term_pcs
       - compute_term_pcs_stepdown
+      - extract_pcs
   - title: Association analysis
     contents:
       - test_genes

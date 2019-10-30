@@ -5,7 +5,8 @@
 \title{Plot part of an ontology as a tree.}
 \usage{
 plot_hierarchy(path, o, terms, test = NULL, include_ancestors = TRUE,
-  highlight = character(0), text_wrap = 20, font = "Arial")
+  highlight = character(0), highlight.color = "black",
+  text_wrap = 20, font = "Arial")
 }
 \arguments{
 \item{path}{Path to save Graphviz DOT file.}
@@ -19,6 +20,8 @@ plot_hierarchy(path, o, terms, test = NULL, include_ancestors = TRUE,
 \item{include_ancestors}{Include all ancestors of terms in `terms`.}
 
 \item{highlight}{Character vector of terms to highlight.}
+
+\item{highlight.color}{Border color for highlighted terms.}
 
 \item{text_wrap}{Wrap term descriptions at this line width.}
 

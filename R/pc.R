@@ -125,12 +125,6 @@ compute_term_pcs_stepdown <- function(
 #' @param max_pcs Return at most this number of PCs.
 #' @param num_parts Number of parts to write output to.
 #' @param rsvd_threshold Use randomized SVD when number of variables exceeds this threshold.
-#' @return A list of singular value decompositions for each gene Each entry is a list with elements
-#'   \describe{
-#'     \item{\code{u}}{The left-singular vectors.}
-#'     \item{\code{d}}{The non-zero singular values.}
-#'     \item{\code{v}}{The right-singular vectors.}
-#'   }
 #' @export
 compute_gene_pcs <- function(
   path,
@@ -159,6 +153,23 @@ compute_gene_pcs <- function(
   saveRDS(out, path)
 }
 
+#' Extract the PCs of a specific set of terms.
+#'
+#' @param path Path to PC file.
+#' @param terms Character vector of terms (or genes) to extract.
+#' @export
+extract_pcs <- function(path, terms) {
+  base <- readRDS(path)
+  part_terms <- lapply(base$terms, intersect, terms)
+
+  pcs <- lapply(which(lengths(part_terms) > 0), function(part) {
+    pc <- readRDS(paste0(path, ".part", part))
+    pc[part_terms[[part]]]
+  })
+  unlist(pcs, recursive=FALSE)
+}
+
+
 #' @importFrom future.apply future_lapply
 .compute_snp_pcs <- function(data, term_snps, stand, explain_var, max_pcs, rsvd_threshold) {
   future_lapply(term_snps, function(snps) tryCatch({
@@ -173,7 +184,6 @@ compute_gene_pcs <- function(
     }
   }, error=function(e) return(NULL)))
 }
-
 
 #' @importFrom corpcor fast.svd
 .get_svd <- function(x, explain_var, max_pcs) {

@@ -22,14 +22,6 @@ compute_gene_pcs(path, data, stand = "binom2", explain_var = 0.95,
 
 \item{rsvd_threshold}{Use randomized SVD when number of variables exceeds this threshold.}
 }
-\value{
-A list of singular value decompositions for each gene Each entry is a list with elements
-  \describe{
-    \item{\code{u}}{The left-singular vectors.}
-    \item{\code{d}}{The non-zero singular values.}
-    \item{\code{v}}{The right-singular vectors.}
-  }
-}
 \description{
 Compute principal components of SNPs annotated to genes.
 }
