@@ -70,7 +70,7 @@ compute_term_pcs <- function(
 #' @param path Path to output file.
 #' @param o An annotated \code{ontology} object.
 #' @param data A \code{BEDData} object.
-#' @param result An association result computed with \code{\link{test_terms}}.
+#' @param result An association result computed with \code{\link{test_terms}} or \code{\link{test_genes}}.
 #' @param terms A character vector of terms to compute PCs for. Will use all terms if not provided.
 #' @param stepdown Step-down method. One of "top.child", "top.gene".
 #' @param ... Further arguments to \code{\link{compute_term_pcs}}.

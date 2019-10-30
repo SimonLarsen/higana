@@ -14,7 +14,7 @@ compute_term_pcs_stepdown(path, o, data, result, terms = NULL,
 
 \item{data}{A \code{BEDData} object.}
 
-\item{result}{An association result computed with \code{\link{test_terms}}.}
+\item{result}{An association result computed with \code{\link{test_terms}} or \code{\link{test_genes}}.}
 
 \item{terms}{A character vector of terms to compute PCs for. Will use all terms if not provided.}
 
