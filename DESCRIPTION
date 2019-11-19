@@ -23,7 +23,8 @@ Imports:
     future.apply,
     broom,
     dplyr,
-    BEDMatrix
+    BEDMatrix,
+    ggplot2
 Suggests:
     DiagrammeR,
     knitr,

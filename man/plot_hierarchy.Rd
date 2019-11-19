@@ -6,7 +6,8 @@
 \usage{
 plot_hierarchy(path, o, terms, test = NULL, include_ancestors = TRUE,
   highlight = character(0), highlight.color = "black",
-  text_wrap = 20, font = "Arial")
+  text_wrap = 20, font = "Arial", color.low = "#add8e6",
+  color.high = "#ff0000")
 }
 \arguments{
 \item{path}{Path to save Graphviz DOT file.}
@@ -26,6 +27,10 @@ plot_hierarchy(path, o, terms, test = NULL, include_ancestors = TRUE,
 \item{text_wrap}{Wrap term descriptions at this line width.}
 
 \item{font}{Name of font to use in nodes.}
+
+\item{color.low}{Gradient color for least significant terms.}
+
+\item{color.high}{Gradient color for most significant terms.}
 }
 \value{
 Path to produced graph.

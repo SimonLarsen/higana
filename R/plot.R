@@ -9,15 +9,22 @@
 #' @param highlight.color Border color for highlighted terms.
 #' @param text_wrap Wrap term descriptions at this line width.
 #' @param font Name of font to use in nodes.
+#' @param color.low Gradient color for least significant terms.
+#' @param color.high Gradient color for most significant terms.
 #' @return Path to produced graph.
 #' @export
-plot_hierarchy <- function(path, o, terms, test=NULL, include_ancestors=TRUE, highlight=character(0), highlight.color="black", text_wrap=20, font="Arial") UseMethod("plot_hierarchy")
+plot_hierarchy <- function(path, o, terms, test=NULL, include_ancestors=TRUE, highlight=character(0), highlight.color="black", text_wrap=20, font="Arial", color.low="#add8e6", color.high="#ff0000") UseMethod("plot_hierarchy")
 
 #' @importFrom stringr str_wrap
 #' @importFrom stringr str_to_title
 #' @importFrom circlize colorRamp2
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 geom_point
+#' @importFrom ggplot2 scale_color_gradient
+#' @importFrom ggplot2 labs
 #' @export
-plot_hierarchy <- function(path, o, terms, test=NULL, include_ancestors=TRUE, highlight=character(0), highlight.color="black", text_wrap=20, font="Arial") {
+plot_hierarchy <- function(path, o, terms, test=NULL, include_ancestors=TRUE, highlight=character(0), highlight.color="black", text_wrap=20, font="Arial", color.low="#add8e6", color.high="#ff0000") {
   if(class(o) != "ontology") stop("'o' is not an ontology object.")
   if(!is.null(pvalues) && is.null(pvalues)) stop("p-value vector must be named.")
 
@@ -36,10 +43,10 @@ plot_hierarchy <- function(path, o, terms, test=NULL, include_ancestors=TRUE, hi
     pvalues2 <- setNames(pvalues[terms], terms)
     pvalues2[is.na(pvalues2)] <- 1
 
-    color.ramp <- colorRamp2(c(0, -log10(min(pvalues2))), c("#add8e6", "#ff0000"))
+    color.ramp <- colorRamp2(c(0, -log10(min(pvalues2))), c(color.low, color.high))
     fillcolors <- color.ramp(-log10(pvalues2))
   } else {
-    fillcolors <- setNames(rep("#add8e6", length(terms)), terms)
+    fillcolors <- setNames(rep(color.low, length(terms)), terms)
   }
 
   con <- file(path, "w")
@@ -79,7 +86,26 @@ plot_hierarchy <- function(path, o, terms, test=NULL, include_ancestors=TRUE, hi
     }
   }
   write("}", con, append=TRUE)
-
   close(con)
-  return(path)
+
+  # create legend for p-value colors
+  legend <- NULL
+  if(!is.null(test)) {
+    data <- data.frame(p=c(min(pvalues2), 1))
+    legend <- ggplot(data, aes(x=1, y=1, color=-log10(p))) +
+      geom_point() +
+      scale_color_gradient(low=color.low, high=color.high) +
+      labs(color="-log10(p-value)")
+    legend <- .ggplot_get_legend(legend)
+
+  }
+  return(list(path=path, legend=legend))
 }
+
+#' @importFrom ggplot2 ggplot_gtable
+#' @importFrom ggplot2 ggplot_build
+.ggplot_get_legend <- function(p){ 
+  tmp <- ggplot_gtable(ggplot_build(p)) 
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box") 
+  tmp$grobs[[leg]] 
+} 
