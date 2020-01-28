@@ -12,9 +12,9 @@ reference:
       - filter
       - filter_obsolete
       - filter_unannotated
-      - make_genemap
       - permute
       - propagate_annotations
+      - read_bed
       - read_gaf
       - read_obo
       - recompute_ancestors
