@@ -4,10 +4,19 @@
 \alias{plot_hierarchy}
 \title{Plot part of an ontology as a tree.}
 \usage{
-plot_hierarchy(path, o, terms, test = NULL, include_ancestors = TRUE,
-  highlight = character(0), highlight.color = "black",
-  text_wrap = 20, font = "Arial", color.low = "#add8e6",
-  color.high = "#ff0000")
+plot_hierarchy(
+  path,
+  o,
+  terms,
+  test = NULL,
+  include_ancestors = TRUE,
+  highlight = character(0),
+  highlight.color = "black",
+  text_wrap = 20,
+  font = "Arial",
+  color.low = "#add8e6",
+  color.high = "#ff0000"
+)
 }
 \arguments{
 \item{path}{Path to save Graphviz DOT file.}

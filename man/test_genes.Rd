@@ -4,8 +4,14 @@
 \alias{test_genes}
 \title{Perform association test for genes.}
 \usage{
-test_genes(path, formula, covars, family = binomial("logit"),
-  test = NULL, max_pcs = Inf)
+test_genes(
+  path,
+  formula,
+  covars,
+  family = binomial("logit"),
+  test = NULL,
+  max_pcs = Inf
+)
 }
 \arguments{
 \item{path}{Path to PC data.}

@@ -4,8 +4,15 @@
 \alias{compute_gene_pcs}
 \title{Compute principal components of SNPs annotated to genes.}
 \usage{
-compute_gene_pcs(path, data, stand = "binom2", explain_var = 0.95,
-  max_pcs = 50, num_parts = 1, rsvd_threshold = Inf)
+compute_gene_pcs(
+  path,
+  data,
+  stand = "binom2",
+  explain_var = 0.95,
+  max_pcs = 50,
+  num_parts = 1,
+  rsvd_threshold = Inf
+)
 }
 \arguments{
 \item{path}{Path to output file.}

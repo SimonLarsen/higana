@@ -4,8 +4,15 @@
 \alias{compute_term_pcs_stepdown}
 \title{Compute principal components of ontology terms for stepdown test.}
 \usage{
-compute_term_pcs_stepdown(path, o, data, result, terms = NULL,
-  stepdown = "top.child", ...)
+compute_term_pcs_stepdown(
+  path,
+  o,
+  data,
+  result,
+  terms = NULL,
+  stepdown = "top.child",
+  ...
+)
 }
 \arguments{
 \item{path}{Path to output file.}

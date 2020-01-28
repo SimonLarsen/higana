@@ -4,8 +4,14 @@
 \alias{test_terms}
 \title{Perform association test for terms.}
 \usage{
-test_terms(path, formula, covars, family = binomial("logit"),
-  test = NULL, max_pcs = Inf)
+test_terms(
+  path,
+  formula,
+  covars,
+  family = binomial("logit"),
+  test = NULL,
+  max_pcs = Inf
+)
 }
 \arguments{
 \item{path}{Path to PC data.}
