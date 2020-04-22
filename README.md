@@ -25,4 +25,5 @@ If you use Higana in your research please cite the following publication:
 If you want to contact us regarding Higana please contact us in the following order:
 
 * Simon Larsen: simonhffh (AT) gmail (DOT) com
+* Trey Ideker: tideker (AT) ucsd (DOT) edu
 * Jan Baumbach: jan (DOT) baumbach (AT) wzw (DOT) tum (DOT) de
