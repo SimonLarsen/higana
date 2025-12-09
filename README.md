@@ -18,7 +18,8 @@ devtools::install_github("SimonLarsen/higana")
 
 If you use Higana in your research please cite the following publication:
 
-> Publication details to be announced
+> Hierarchical association of COPD to principal genetic components of biological systems.<br>
+Carlin DE, Larsen SJ, Sirupurapu V, Cho MH, Silverman EK, et al. (2023) Hierarchical association of COPD to principal genetic components of biological systems. PLOS ONE 18(5): e0286064. https://doi.org/10.1371/journal.pone.0286064.
 
 ## Contact
 
